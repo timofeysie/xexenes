@@ -3,11 +3,13 @@ import { IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import { IonList, IonItem, IonCheckbox } from '@ionic/react';
 import { IonLabel, IonNote, IonBadge } from '@ionic/react';
 import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
+import { getPlatforms } from '@ionic/react';
 import { RouteComponentProps } from 'react-router';
 import { add } from 'ionicons/icons';
 import React from 'react';
 
 const Home: React.FC<RouteComponentProps> = (props) => {
+  console.log('Platforms',getPlatforms());
   return (
     <IonPage>
       <IonHeader>
