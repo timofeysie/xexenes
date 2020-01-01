@@ -4,6 +4,44 @@ This is an Ionic React app to consume a WikiData list API.
 
 Ionic recently released their first official React based framework.  So this project is to explore it with the same functionality implemented in a string of projects starting a year ago that compared and contrasted React, Angular, React Native, Ionic, Electron and other approaches.
 
+## Table of contents
+
+
+* [Workflow](#workflow)
+* [Upgrade](#upgrade)
+* [The Rules of Hooks](#the-Rules-of-Hooks)
+* [Hooks Concepts](#hooks-Concepts)
+* [Getting started](#getting-started)
+
+
+
+## Workflow
+
+The standard Ionic workflow.
+
+```
+ionic serve
+```
+
+The app will then open in the default browser at this location:
+```
+http://localhost:8100/home
+```
+
+## Upgrade
+
+
+The first commit for this project was from Sep 23 2019.  The current versions in the package.json file are:
+```
+"@ionic/react": "^4.9.0-rc.2",
+"react": "^16.9.0",
+```
+
+The latest release is 4.11.7.
+
+It contains Bug Fixes like *react: fire lifecycle events on initial render, fixes #20071 (9ea75eb)*.  Might be OK.  [Doesn't seem to work in Edge](https://github.com/timofeysie/xexenes/issues/2), but I wont tell if you don't.  Probably worth updating since this project was starting at a time when the Ionic React was just released.
+
+
 ## The Rules of Hooks
 
 These are major rules we must always follow.
@@ -31,6 +69,15 @@ From the [React webpage](https://reactjs.org/docs/hooks-faq.html#how-to-test-com
 That's all well and good.  For me, it comes down to available jobs in Sydney.  70% React vs. about 30% Angular.  So to be considered for a larger selection of jobs, React is essential.  If those jobs include hooks, then I need hooks.  The problem is, probably existing code base jobs outweigh greenfield jobs, so a knowledge of Redux is also needed.
 
 Having debates like this are fine, but it's taking me away from writing code.
+
+An update on this.  After talking to a few recruiters, and landing two more senior Angular roles, I'm not sure how urgent becoming a senior React developer is.  What I said above about inheritance and classes however is still very relevant after working on a project which was class/inheritance heavy which made understanding the code more difficult.  There still seem to be way more React roles, but apparently they are for smaller companies, while the larger companies still use Angular.  It still has a huge community as seen [on the framework watch](https://frontendwatch.com/).
+
+The jobs ratio continues to be of a concern:
+```
+Angular: 74 jobs
+React: 221 jobs
+```
+
 
 ## Hooks Concepts
 
