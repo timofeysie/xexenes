@@ -15,7 +15,7 @@ const NewItem: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton />
+            <IonBackButton defaultHref="/home" />
           </IonButtons>
           <IonTitle>New Item</IonTitle>
         </IonToolbar>

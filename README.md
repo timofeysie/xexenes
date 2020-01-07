@@ -28,6 +28,17 @@ The app will then open in the default browser at this location:
 http://localhost:8100/home
 ```
 
+## SPAQL
+
+[SPARQL](https://en.wikipedia.org/wiki/SPARQL) (pronounced "sparkle", a recursive acronym for SPARQL Protocol and RDF Query Language) is an RDF query language—that is, a semantic query language for databases—able to retrieve and manipulate data stored in Resource Description Framework (RDF) format.
+
+
+## Adding Capacitor PWA support
+
+
+[Here are the intro docs](https://capacitor.ionicframework.com/docs/getting-started/).
+
+
 ## Upgrade
 
 
@@ -41,6 +52,13 @@ The latest release is 4.11.7.
 
 It contains Bug Fixes like *react: fire lifecycle events on initial render, fixes #20071 (9ea75eb)*.  Might be OK.  [Doesn't seem to work in Edge](https://github.com/timofeysie/xexenes/issues/2), but I wont tell if you don't.  Probably worth updating since this project was starting at a time when the Ionic React was just released.
 
+When I cloned this project on a new laptop, got this message:
+```
+> npm i -D -E react-scripts
+npm WARN deprecated core-js@2.6.11: core-js@<3 is no longer maintained and not recommended for usage due to the number of issues. Please, upgrade your dependencies to the actual version of core-js@3.
+```
+
+
 
 ## The Rules of Hooks
 
@@ -52,7 +70,8 @@ These are major rules we must always follow.
 4. Never call a Hook from a regular function
 5. Hooks can call other Hooks
 
-Why hooks?  To win the fight against evil classes that tend to pollute our codebase.  Wait, what???
+Why hooks?  *To win the fight against evil classes that tend to pollute our codebase.*  Wait, what???
+
 The stated dream of hooks is *to create and share small, re-usable and maintainable pieces of logic in our applications without nesting some more into the components tree. No mixins, no higher-order components, no render props craziness.*
 
 A developer at my previous role told me "classes are gross!".  Since we used Angular there, and he was a React developer, it was confusing.  He was actually part of the backend serverless API making team.  I asked him a question about some RxJs observable issue I was having and he said he couldn't help.  Like most developers, they only know one world, and don't flit between worlds in a time wasting frivolous manner like I do.  So I justified that and thought that certainly he didn't mean *Angular classes*, as the whole Angular framework is based on classes.
@@ -72,7 +91,7 @@ Having debates like this are fine, but it's taking me away from writing code.
 
 An update on this.  After talking to a few recruiters, and landing two more senior Angular roles, I'm not sure how urgent becoming a senior React developer is.  What I said above about inheritance and classes however is still very relevant after working on a project which was class/inheritance heavy which made understanding the code more difficult.  There still seem to be way more React roles, but apparently they are for smaller companies, while the larger companies still use Angular.  It still has a huge community as seen [on the framework watch](https://frontendwatch.com/).
 
-The jobs ratio continues to be of a concern:
+The jobs ratio continues to be of a concern for Angular developers:
 ```
 Angular: 74 jobs
 React: 221 jobs
