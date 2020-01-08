@@ -28,13 +28,23 @@ The app will then open in the default browser at this location:
 http://localhost:8100/home
 ```
 
+## Implement categories from a static list #3
+
+Create a categories component to view the list.
+```
+{ name: 'fallacies', label: 'Fallacies', language: 'en', wd: 'Q186150', wdt: 'P31' },
+{ name: 'cognitive_bias', label: 'Cognitive Bias', language: 'en', wd: 'Q1127759', wdt: 'P31' }
+```
+
+We want to use the latest redux-hooks for this, which is officially about two months old now.  I've read about how redux-hooks work now to allow state in function (classes are out now, sorry Angular).  Here is a good example to follow that just shows your basic (but pretty) [to-do list in redux-hooks](https://upmostly.com/tutorials/build-a-todo-app-in-react-using-hooks).
+
+
 ## SPAQL
 
 [SPARQL](https://en.wikipedia.org/wiki/SPARQL) (pronounced "sparkle", a recursive acronym for SPARQL Protocol and RDF Query Language) is an RDF query language—that is, a semantic query language for databases—able to retrieve and manipulate data stored in Resource Description Framework (RDF) format.
 
 
 ## Adding Capacitor PWA support
-
 
 [Here are the intro docs](https://capacitor.ionicframework.com/docs/getting-started/).
 

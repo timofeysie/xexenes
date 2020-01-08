@@ -7,7 +7,7 @@ import { getPlatforms } from '@ionic/react';
 import { RouteComponentProps } from 'react-router';
 import { add } from 'ionicons/icons';
 import React from 'react';
-
+import { Categories } from './Categories';
 const Home: React.FC<RouteComponentProps> = (props) => {
   console.log('Platforms',getPlatforms());
   return (
@@ -18,6 +18,7 @@ const Home: React.FC<RouteComponentProps> = (props) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <Categories />
         <IonList>
           <IonItem>
             <IonCheckbox slot="start" />
