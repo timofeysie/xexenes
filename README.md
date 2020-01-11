@@ -38,6 +38,65 @@ Create a categories component to view the list.
 
 We want to use the latest redux-hooks for this, which is officially about two months old now.  I've read about how redux-hooks work now to allow state in function (classes are out now, sorry Angular).  Here is a good example to follow that just shows your basic (but pretty) [to-do list in redux-hooks](https://upmostly.com/tutorials/build-a-todo-app-in-react-using-hooks).
 
+Coming from an Angular background, little things like this can be tricky:
+```
+import { Categories } from './Categories';
+```
+
+Causes this error:
+```
+Attempted import error: 'Categories' is not exported from './Categories'.
+```
+
+That might work in Angular, but in React it should be:
+```
+import Categories from './Categories';
+```
+
+I always forget the exact meaning of with or without curly brackets.  It because in Angular you usually write this at the start of the file:
+```
+export class Categories extends whatever
+```
+
+But in React these days you write this at the *end* of the file:
+```
+export default Categories
+```
+
+Not sure why you can't just wirte on one line:
+```
+export default function Categories() {
+```  
+
+But mine is not to question (too much) but to learn the React way.
+
+Running the build again and this error shows up:
+```
+[ERROR] Invalid project type: react (project config: ./ionic.config.json).        
+        Project type must be one of: angular, ionic-angular, ionic1, custom
+```
+
+[This issue](https://stackoverflow.com/questions/59050160/building-ionic-react-for-android-invalid-project-type-react) has been open for a month with not even a comment on the Stack.
+
+There is a [GitHub issue](https://github.com/ionic-team/ionic-cli/issues/2531) that was closed without resolution on the Ionic site.
+
+There is another Ionic framework [GitHub issue](https://github.com/ionic-team/ionic-cli/issues/2329) that has some action on it.  It seems the ionic.config.json file might be the problem.s
+```
+{
+  "name": "tea",
+  "integrations": {},
+  "type": "react"
+}
+```
+
+I think my version of node was the problem.  I switched to use 12 via nvm:
+```
+Now using node v12.9.1 (npm v6.10.2)
+```
+
+And things ran ok.  But who chose the name 'tea' for the project?  I thought it was Xexenes?
+
+
 
 ## SPAQL
 

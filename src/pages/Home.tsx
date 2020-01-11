@@ -7,9 +7,10 @@ import { getPlatforms } from '@ionic/react';
 import { RouteComponentProps } from 'react-router';
 import { add } from 'ionicons/icons';
 import React from 'react';
-import { Categories } from './Categories';
+import Categories from './Categories';
+
 const Home: React.FC<RouteComponentProps> = (props) => {
-  console.log('Platforms',getPlatforms());
+  // console.log('Platforms',getPlatforms()); // "tablet", "desktop"
   return (
     <IonPage>
       <IonHeader>
