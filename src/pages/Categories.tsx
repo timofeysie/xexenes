@@ -1,87 +1,104 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './Categories.css';
+import { IonList, IonItem, IonCheckbox } from '@ionic/react';
+import { IonLabel, IonNote, IonBadge } from '@ionic/react';
+import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
 
 function Categories() {
-  const [todos, setTodos] = useState([
-    {
-      content: 'Pickup dry cleaning',
-      isCompleted: true,
+  const [categories, setCategories] = useState([
+    { 
+        content: 'fallacies',
+        name: 'fallacies', 
+        label: 'List of Fallacies', 
+        language: 'en', 
+        wd: 'Q186150', 
+        wdt: 'P31',
+        isCompleted: true 
     },
-    {
-      content: 'Get haircut',
-      isCompleted: false,
-    },
-    {
-      content: 'Build a todo app in React',
-      isCompleted: false,
+    { 
+        content: 'cognitive bias',
+        name: 'cognitive_bias', 
+        label: 'Cognitive Bias', 
+        language: 'en', 
+        wd: 'Q1127759', 
+        wdt: 'P31',
+        isCompleted: false
     }
   ]);
 
   function handleKeyDown(e: any, i: number) {
+      console.log(e);
     if (e.key === 'Enter') {
-      createTodoAtIndex(e, i);
+      createCatgoryAtIndex(e, i);
     }
-    if (e.key === 'Backspace' && todos[i].content === '') {
+    if (e.key === 'Backspace' && categories[i].content === '') {
         e.preventDefault();
-        return removeTodoAtIndex(i);
+        return removeCatgoryAtIndex(i);
       }
   }
 
-  function createTodoAtIndex(e: any, i: number) {
-    const newTodos = [...todos];
-    newTodos.splice(i + 1, 0, {
+  function createCatgoryAtIndex(e: any, i: number) {
+    const newCategories = [...categories];
+    newCategories.splice(i + 1, 0, {
       content: '',
-      isCompleted: false,
+        name: '',
+        label: '',
+        language: 'en', 
+        wd: '', 
+        wdt: 'P31',
+        isCompleted: false
     });
-    setTodos(newTodos);
+    setCategories(newCategories);
     setTimeout(() => {
         let element = document.forms[0].elements[i + 1] as HTMLElement;
         element.focus();
     }, 0);
   }
 
-  function updateTodoAtIndex(e: any, i: number) {
-    const newTodos = [...todos];
-    newTodos[i].content = e.target.value;
-    setTodos(newTodos);
+  function updateCategoryAtIndex(e: any, i: number) {
+    const newCategories = [...categories];
+    newCategories[i].content = e.target.value;
+    setCategories(newCategories);
   }
 
-  function removeTodoAtIndex(i: number) {
-    if (i === 0 && todos.length === 1) return;
-    setTodos(todos => todos.slice(0, i).concat(todos.slice(i + 1, todos.length)));
+  function removeCatgoryAtIndex(i: number) {
+    if (i === 0 && categories.length === 1) return;
+    setCategories(categories => categories.slice(0, i).concat(categories.slice(i + 1, categories.length)));
     setTimeout(() => {
       let element = document.forms[0].elements[i - 1] as HTMLElement;
       element.focus();
     }, 0);
   }
 
-  function toggleTodoCompleteAtIndex(index: number) {
-    const temporaryTodos = [...todos];
-    temporaryTodos[index].isCompleted = !temporaryTodos[index].isCompleted;
-    setTodos(temporaryTodos);
+  function toggleCategoryCompleteAtIndex(index: number) {
+    const temporaryCategories = [...categories];
+    temporaryCategories[index].isCompleted = !temporaryCategories[index].isCompleted;
+    setCategories(temporaryCategories);
   }
 
   return (
-    <form className="todo-list">
-      <ul>
-        {todos.map((todo, i) => (
-          <div className="todo">
-            <div className={'checkbox'} 
-                onClick={() => toggleTodoCompleteAtIndex(i)}>
-                {todo.isCompleted && (
-                    <span>&#x2714;</span>
-                )}
-            </div>
+    <form className="category-list">
+      <IonList>
+        {categories.map((category, i) => (
+          <IonItem>
+            <IonCheckbox slot="start"
+                onClick={() => toggleCategoryCompleteAtIndex(i)}></IonCheckbox>
             <input
                type="text"
-               value={todo.content}
+               value={category.content}
                onKeyDown={e => handleKeyDown(e, i)}
-               onChange={e => updateTodoAtIndex(e, i)}
-             />
-          </div>
+               onChange={e => updateCategoryAtIndex(e, i)}
+             />  
+  <IonLabel>
+    <h1>Create Idea!</h1>
+    <IonNote>Run Idea by Brandy</IonNote>
+  </IonLabel>
+  <IonBadge color="success" slot="end">
+    5 Days
+  </IonBadge>
+      </IonItem>
         ))}
-      </ul>
+</IonList>
     </form>
   );
 }

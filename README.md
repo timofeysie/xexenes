@@ -144,11 +144,15 @@ That's in out map function:
 It looks like the i value provides the unique key.  Those values do not repeat.  I thought this might be a TypeScript thing also, but StackOverflow has a more likely cause:
 *You should not be using index of the map for you Key, its an antipattern, it may lead to unpredictable results.  [Please check this](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318).  You should be using proper unique-id for your Key, like a DB id or some unique-id.  This Key is used internally to identify the DOM elements to render and not to render again.*
 
-There it is: *don't use index of the map for Keys*.  Leave that for now.  Can we supress that warning?  It's a big fat red stacktrace which is a bad look.  After the next chenge, it's gone.  Hmmm...
+There it is: *don't use index of the map for Keys*.  Leave that for now.  Can we suppress that warning?  It's a big fat red stacktrace which is a bad look.  After the next change, it's gone.  Hmmm...
 
 Next we have to convert the sample code to be more like the categories we want, as well as use the Ionic checkbox instead of the (albeit nice) custom version from the article.
 
+This is where things need to be thought out a bit more.  For us, categories are not check boxes.  While they may have things in common with a to do list, they are not easily completed.  It will depend on completing all the items in the list for the category which could take some time.  It's also turning out to be a difficult thing to add a new category.  I have not been able to do it by hand, so this app now is going to be the place where we figure out how to let the user type in the type of list they are looking for, and the app will go and figure out how to get that list.
 
+We know how to get a list of fallacies or cognitive biases, but how do we get an arbitrary "list of x"?  So the FAB button to add a new category with a link to a new page make more sense than the efficient in-line editing that the sample hooks demo provided.
+
+There is also the prospect of implementing the full-blown Redux pattern we will need for this app, but that will also require more planning.
 
 
 ## SPAQL
