@@ -21,7 +21,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #555;
 }
 
 .todo {
@@ -55,7 +55,7 @@
 
 .checkbox:hover {
   background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0);
+  border: 1px solid rgba(25, 25, 50, 0);
 }
 
 .checkbox-checked {
@@ -73,7 +73,7 @@ ul {
 input {
   border: none;
   background: transparent;
-  color: white;
+  color: #555;
   font-size: 1.4rem;
   outline: none;
   width: 100%;

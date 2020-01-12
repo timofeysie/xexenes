@@ -96,6 +96,59 @@ Now using node v12.9.1 (npm v6.10.2)
 
 And things ran ok.  But who chose the name 'tea' for the project?  I thought it was Xexenes?
 
+While implementing the code to add a category, we are getting this error:
+```
+Property 'focus' does not exist on type 'Element'. 
+```
+
+That's coming from this code:
+```
+setTimeout(() => {
+    document.forms[0].elements[i + 1].focus();
+}, 0);
+```
+
+The explanation for this is worth noting: *Updating the state inside of a React component does not happen instantaneously. It can sometimes take time, especially if what we’re updating contains a lot of data.  Therefore, we add a timeout delay to the focus to wait for the state to finish updating before focusing on the newly rendered input. [more details](https://upmostly.com/tutorials/settimeout-in-react-components-using-hooks)*
+
+Anyhow, the error.  StackOverflow: *Use the type HTMLElement instead of Element.*
+
+StackOverflow, what would we do without you?  This works in the timeout instead:
+```
+let element = document.forms[0].elements[i + 1] as HTMLElement;
+element.focus();
+```
+
+That's TyhpeScript.  We have also been getting issues like this:
+```
+Parameter 'index' implicitly has an 'any' type.  TS7006
+```
+
+Add a type annotation to the variable in question and the error goes away.  It's pretty standard stuff now.
+```
+index: number
+```
+
+We are still getting this non-breaking warning:
+```
+Warning: Each child in a list should have a unique "key" prop.
+Check the render method of `Categories`. See https://fb.me/react-warning-keys for more information.
+    in div (at Categories.tsx:50)
+```
+
+That's in out map function:
+```
+{todos.map((todo, i) => (
+    <div className="todo">
+```
+
+It looks like the i value provides the unique key.  Those values do not repeat.  I thought this might be a TypeScript thing also, but StackOverflow has a more likely cause:
+*You should not be using index of the map for you Key, its an antipattern, it may lead to unpredictable results.  [Please check this](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318).  You should be using proper unique-id for your Key, like a DB id or some unique-id.  This Key is used internally to identify the DOM elements to render and not to render again.*
+
+There it is: *don't use index of the map for Keys*.  Leave that for now.  Can we supress that warning?  It's a big fat red stacktrace which is a bad look.  After the next chenge, it's gone.  Hmmm...
+
+Next we have to convert the sample code to be more like the categories we want, as well as use the Ionic checkbox instead of the (albeit nice) custom version from the article.
+
+
 
 
 ## SPAQL
