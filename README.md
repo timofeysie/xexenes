@@ -155,6 +155,80 @@ We know how to get a list of fallacies or cognitive biases, but how do we get an
 There is also the prospect of implementing the full-blown Redux pattern we will need for this app, but that will also require more planning.
 
 
+## Implementing Redux
+
+
+Another [Todo example with a Redux boilerpate](https://github.com/akshayjp123/todo-with-react-hooks) that has the [following GitHub companion](https://medium.com/@akshayjpatil11/implementing-redux-architecture-using-react-hooks-39b47762a2fb).
+
+Steps to setup:
+1. Create a store with initialState, case 'PUT_DATA', case 'DONE_TODO' and a StoreProvider(props
+
+This article doesn't use TypeScript, so this is the first issue in the store.ts:
+```
+export const Store = React.createContext();
+```
+
+Causes this error:
+```
+Expected 1-2 arguments, but got 0.ts(2554)
+index.d.ts(336, 9): An argument for 'defaultValue' was not provided.
+```
+
+Raising up the initial state above the creation line fixes the issue:
+```
+const initialState = {
+    todos: []
+}
+export const Store = React.createContext(initialState);
+```
+
+It's kind of like an instant linter, and well worth it.
+
+The next issue is
+```
+reducer(state: any, action: any) {
+```
+
+Do we have types for those?  Using 'any' too much can reduce our linting prowess.
+
+The props also have the same problem:
+```
+export function StoreProvider(props: any) {
+    const [state, dispatch] = React.useReducer(reducer, initialState)
+    const value = {state, dispatch}
+    return <Store.Provider value={value}>{props.children}</Store.Provider>
+}
+```
+
+But more pressing, is the last line there, which causes this error:
+```
+Cannot find namespace 'Store'.ts(2503)
+```
+
+It's missing the types?  The most obvious solution is to install Redux which we haven't done yet.
+```
+npm install redux --save
+npm install @types/redux
+npm install tslint
+```
+
+That didn't help.  I renamed the file from .ts to .tsx and the errors went away.  All except one:
+```
+(JSX attribute) React.ProviderProps<{ todos: never[]; }>.value: {
+    todos: never[];
+}
+Property 'todos' is missing in type '{ state: any; dispatch: React.Dispatch<any>; }' but required in type '{ todos: never[]; }'.ts(2741)
+store.tsx(4, 5): 'todos' is declared here.
+index.d.ts(289, 9): The expected type comes from property 'value' which is declared here on type 'IntrinsicAttributes & ProviderProps<{ todos: never[]; }>'
+```
+
+Not sure about that one.  Can't but a type on todos in the initial state:
+```
+'any' only refers to a type, but is being used as a value here.ts(2693)
+```
+
+
+
 ## SPAQL
 
 [SPARQL](https://en.wikipedia.org/wiki/SPARQL) (pronounced "sparkle", a recursive acronym for SPARQL Protocol and RDF Query Language) is an RDF query language—that is, a semantic query language for databases—able to retrieve and manipulate data stored in Resource Description Framework (RDF) format.
