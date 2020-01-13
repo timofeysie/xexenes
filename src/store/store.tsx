@@ -1,12 +1,12 @@
 import React from "react";
-
-const initialState = {
-    todos: any []
+import Todos from './types/categories'
+const initialState: any = {
+    todos: []
 }
 
 export const Store = React.createContext(initialState);
 
-function reducer(state: any, action: any) {
+function reducer(state: Todos, action: any) {
     switch(action.type){
 
         case 'PUT_DATA':

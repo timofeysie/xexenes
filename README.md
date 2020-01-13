@@ -161,7 +161,7 @@ There is also the prospect of implementing the full-blown Redux pattern we will 
 Another [Todo example with a Redux boilerpate](https://github.com/akshayjp123/todo-with-react-hooks) that has the [following GitHub companion](https://medium.com/@akshayjpatil11/implementing-redux-architecture-using-react-hooks-39b47762a2fb).
 
 Steps to setup:
-1. Create a store with initialState, case 'PUT_DATA', case 'DONE_TODO' and a StoreProvider(props
+1. Create a store with initialState, case 'PUT_DATA', case 'DONE_TODO' and a StoreProvider.
 
 This article doesn't use TypeScript, so this is the first issue in the store.ts:
 ```
@@ -227,6 +227,57 @@ Not sure about that one.  Can't but a type on todos in the initial state:
 'any' only refers to a type, but is being used as a value here.ts(2693)
 ```
 
+### An element access expression should take an argument
+
+The last if the errors on the first store file was causing this compile error:
+```
+>ionic serve
+> react-scripts.cmd start
+[react-scripts] Starting the development server...
+[react-scripts] Browserslist: caniuse-lite is outdated. Please run next command `npm update`
+[react-scripts] Failed to compile.
+[react-scripts] ./src/store/store.tsx
+[react-scripts]   Line 4:  Parsing error: An element access expression should take an argument
+```
+
+The problem is the type of the initial state, not 'value' in the markup on the last line which has a red squiggly line under it.
+```
+const initialState = {
+    todos: []
+}
+...
+    return <Store.Provider value={value}>{props.children}</Store.Provider>
+}
+```
+
+The solution is not to type the todos, but the initial state itself like this:
+```
+const initialState: any = {
+```
+
+But We need to get rid of the any types an make some interfaces for our project.  [The official Redux docs](https://redux.js.org/recipes/usage-with-typescript/)] have example on how to add Redux types when using TypeScript:
+```
+// src/store/chat/types.ts
+export interface Message {
+  user: string
+  message: string
+  timestamp: number
+}
+export interface ChatState {
+  messages: Message[]
+}
+```
+
+Then we can use that instead of any in the initial state:
+```
+export function chatReducer(
+  state = initialState,
+  action: ChatActionTypes
+): ChatState {
+  switch (action.type) {
+```
+
+Had to restart VSCode after this to get some strange editor errors to disappear, and then all runs fine.  On with the show.
 
 
 ## SPAQL
