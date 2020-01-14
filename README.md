@@ -162,8 +162,9 @@ Another [Todo example with a Redux boilerpate](https://github.com/akshayjp123/to
 
 Steps to setup:
 1. Create a store with initialState, case 'PUT_DATA', case 'DONE_TODO' and a StoreProvider.
+2. Build the components.
 
-This article doesn't use TypeScript, so this is the first issue in the store.ts:
+Starting off with the store file.  This article doesn't use TypeScript, so this is the first issue in the store.ts:
 ```
 export const Store = React.createContext();
 ```
@@ -278,6 +279,85 @@ export function chatReducer(
 ```
 
 Had to restart VSCode after this to get some strange editor errors to disappear, and then all runs fine.  On with the show.
+
+
+### Build the components, *the Billion Dollar Mistake* and page refresing buttons
+
+Adding the put and done functions to the new item component was pretty easy.  But in the template we run into this error:
+```
+<li className="todo_item" 
+    value={index} 
+    key={index}
+    onClick={(e) => doneTodo(e.target.value)}>
+```
+
+The last line there has a red squiggly:
+```
+Property 'value' does not exist on type 'EventTarget'.ts(2339)
+```
+
+I changed the event to look like this:
+```
+onClick={(e) => doneTodo(e.target as HTMLElement)}
+```
+
+StackOverflow says: *HTMLElement is the parent of all HTML elements, but isn't guaranteed to have the property value. TypeScript detects this and throws the error. Cast event.target to the appropriate HTML element to ensure it is HTMLInputElement which does have a value property ([source](https://stackoverflow.com/questions/44321326/property-value-does-not-exist-on-type-eventtarget-in-typescript/44321394))*
+
+But unfortunately, none of those fixes worked.  This does, but then the vague type 'any' is pushed into the function:
+```
+const doneTodo = (index: any) => {
+    console.log('index', index);
+    return dispatch({
+        type: 'DONE_TODO',
+        payload: index.value
+    })
+}
+```
+
+What is the type of the list element ```<li>```?
+
+But the errors are gone and that is good enough for now.  But when trying to use some more Ionic elements like IonInput, this comes up in previously working code, now with a similar error:
+```
+Object is possibly 'null'.  TS2531
+    48 |             <IonInput placeholder="Enter Input" 
+    49 |                 id="todo_input" type="text"       
+  > 50 |                 onChange={(e)=> setTodo(e.target.value)}></IonInput><br/>
+       |                                         ^
+```
+
+In VSCode, if you hover over the value portion of the argument to setTodo, you see this TypeScript error:
+```
+Property 'value' does not exist on type 'EventTarget'.ts(2339)
+```
+
+However, if you hover over the 'e' part, you get the same as the compile error in the browser:
+```
+Object is possibly 'null'.  TS2531
+```
+
+This is a [classic StackOverflow answer](): *This feature is called "strict null checks", to turn it off ensure that the --strictNullChecks compiler flag is not set.  However, the existence of null has been described as The Billion Dollar Mistake, so it is exciting to see languages such as TypeScript introducing a fix.*
+
+But for us, in this case, it as a new Redux Hook, not our own defined constant.  So thie same solution doesn't work:
+```
+setTodo(e.target.value as HTMLElement)
+```
+
+The error over 'e' would then change to:
+```
+Argument of type 'HTMLElement' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'HTMLElement' is not assignable to type 'string'.ts(2345)
+```
+
+Tried this schenanigan:
+```
+setTodo(e.target.value !== null ? e.target.value : ''
+```
+
+Using a regular input works fine.  But then, the add todo action has the impressive ability to refresh the app.  This is getting interesting!
+
+Using IonInput causes an "Object is possibly 'null'" error on the event arg.
+
+Using an IonButton causes a page refresh.  Are these bugs in the Ionic React implementation?  Quick, take me to their GitHub!
 
 
 ## SPAQL

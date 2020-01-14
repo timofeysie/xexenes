@@ -10,9 +10,9 @@ function reducer(state: Todos, action: any) {
     switch(action.type){
 
         case 'PUT_DATA':
-            let tods: any = state.todos;
-            tods.push(action.payload);
-            return { ...state, todos: tods }
+            let todosList: any = state.todos;
+            todosList.push(action.payload);
+            return { ...state, todos: todosList }
         
         case 'DONE_TODO':
             let index: any = action.payload;
