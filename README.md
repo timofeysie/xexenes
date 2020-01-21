@@ -364,6 +364,9 @@ They have [about 800 issues](https://github.com/ionic-team/ionic/issues) on the 
 Maybe we should try the latest release.
 
 Remember, this project is currently working with ^4.9.0-rc.2.  The latest is 4.11.8.
+...
+"react": "^16.9.0",
+```
 
 After changing that, running npm i, and starting the ionic serve again, this shows up:
 ```
