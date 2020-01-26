@@ -470,6 +470,28 @@ Using IonInput causes an "Object is possibly 'null'" error on the event arg.
 
 Using an IonButton causes a page refresh.  Are these bugs in the Ionic React implementation?  Quick, take me to their GitHub!
 
+They have [about 800 issues](https://github.com/ionic-team/ionic/issues) on the Ionic project.  Is it worth the effort?
+
+Maybe we should try the latest release.
+
+Remember, this project is currently working with ^4.9.0-rc.2.  The latest is 4.11.8.
+...
+"react": "^16.9.0",
+```
+
+After changing that, running npm i, and starting the ionic serve again, this shows up:
+```
+/Users/tim/repos/xexenes/src/App.tsx
+TypeScript error in /Users/tim/repos/xexenes/src/App.tsx(28,4):
+Property 'translate' is missing in type '{ children: Element; }' but required in type 'Pick<HTMLAttributes<HTMLIonAppElement>, "title" | "hidden" | "dir" | "slot" | "color" | "children" | "accessKey" | "draggable" | "lang" | "translate" | "className" | "id" | "prefix" | ... 239 more ... | "onTransitionEndCapture">'.  TS2741
+
+    26 | 
+    27 | const App: React.FC = () => (
+  > 28 |   <IonApp>
+       |    ^
+    29 |     <IonReactRouter>
+```
+
 
 ## SPAQL
 
