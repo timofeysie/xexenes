@@ -28,15 +28,126 @@ The app will then open in the default browser at this location:
 http://localhost:8100/home
 ```
 
+## Ionic component problems
+
+While working on issue #3, *Implement categories from a static*, some interesting errors came up with the IonInput and IonButton components.
+
+In the NewItem.tsx file render function, using this markup:
+```html
+<IonInput placeholder="Enter Input" 
+    id="todo_input" 
+    type="text"       
+    onChange={(e)=> setTodo(e.target.value)}></IonInput>
+```
+
+Hovering over the e or target objects the VSCode editor shows this TypeScript error:
+```
+(parameter) e: Event
+Object is possibly 'null'.ts(2531)
+```
+
+
+When hovering over the .value part is shows:
+```
+Property 'value' does not exist on type 'EventTarget'.
+```
+
+That last one we have seen before and solved like this:
+```
+(e.target as HTMLElement)
+```
+
+Using HTMLElement doesn't work, and will still give this error on the .value section:
+```
+Property 'value' does not exist on type 'HTMLElement'.
+```
+
+The solution, as was used before is to find the correct HTML element, which in this case is the *HTMLInputElement* type:
+```
+onChange={(e)=> setTodo((e.target as HTMLInputElement).value)}
+```
+
+
+Then problem with the IonButton was different.  Strangely it causes a page refresh.  Here is the markup:
+```html
+<IonButton 
+    id="submit_button" 
+    type="submit" 
+    onClick={(e) => putData(e)}>Add</IonButton>
+```
+
+That calls this action:
+```javascript
+const putData = (e: any) => {
+    e.preventDefault()
+    return dispatch({
+      type: 'PUT_DATA',
+      payload: todo
+    })
+}
+```
+
+Using a regular button calls the same action, but works as expected, so it's probably not the onclick function.  Have to Google this one.
+
+
+
+
+### Previous notes
+when trying to use some more Ionic elements like IonInput, this comes up in previously working code, now with a similar error:
+```
+Object is possibly 'null'.  TS2531
+    48 |             <IonInput placeholder="Enter Input" 
+    49 |                 id="todo_input" type="text"       
+  > 50 |                 onChange={(e)=> setTodo(e.target.value)}></IonInput><br/>
+       |                                         ^
+```
+
+In VSCode, if you hover over the value portion of the argument to setTodo, you see this TypeScript error:
+```
+Property 'value' does not exist on type 'EventTarget'.ts(2339)
+```
+
+However, if you hover over the 'e' part, you get the same as the compile error in the browser:
+```
+Object is possibly 'null'.  TS2531
+```
+
+This is a [classic StackOverflow answer](): *This feature is called "strict null checks", to turn it off ensure that the --strictNullChecks compiler flag is not set.  However, the existence of null has been described as The Billion Dollar Mistake, so it is exciting to see languages such as TypeScript introducing a fix.*
+
+But for us, in this case, it as a new Redux Hook, not our own defined constant.  So thie same solution doesn't work:
+```
+setTodo(e.target.value as HTMLElement)
+```
+
+The error over 'e' would then change to:
+```
+Argument of type 'HTMLElement' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'HTMLElement' is not assignable to type 'string'.ts(2345)
+```
+
+Tried this schenanigan:
+```
+setTodo(e.target.value !== null ? e.target.value : ''
+```
+
+Using a regular input works fine.  But then, the add todo action has the impressive ability to refresh the app.  This is getting interesting!
+
+Using IonInput causes an "Object is possibly 'null'" error on the event arg.
+
+Using an IonButton causes a page refresh.  Are these bugs in the Ionic React implementation?  Quick, take me to their GitHub!
+
+
+
 ## Implement categories from a static list #3
 
-Create a categories component to view the list.
+
+Using Redux hooks for this one.  The goal is to create a categories component to view the list.
 ```
 { name: 'fallacies', label: 'Fallacies', language: 'en', wd: 'Q186150', wdt: 'P31' },
 { name: 'cognitive_bias', label: 'Cognitive Bias', language: 'en', wd: 'Q1127759', wdt: 'P31' }
 ```
 
-We want to use the latest redux-hooks for this, which is officially about two months old now.  I've read about how redux-hooks work now to allow state in function (classes are out now, sorry Angular).  Here is a good example to follow that just shows your basic (but pretty) [to-do list in redux-hooks](https://upmostly.com/tutorials/build-a-todo-app-in-react-using-hooks).
+Redux hooks are officially about two months old now.  I've read about how redux-hooks work now to allow state in function (classes are out now, sorry Angular).  Here is a good example to follow that just shows your basic (but pretty) [to-do list in redux-hooks](https://upmostly.com/tutorials/build-a-todo-app-in-react-using-hooks).
 
 Coming from an Angular background, little things like this can be tricky:
 ```
