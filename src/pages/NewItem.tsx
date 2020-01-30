@@ -11,10 +11,16 @@ import {
 } from '@ionic/react';
 import React from 'react';
 import { Store } from '../store/store';
+import { useReducer, useState, useContext } from 'react';
+import { createContext } from 'react';
+import { Component, useEffect } from "react";
+import { render } from 'react-dom';
 
 const NewItem: React.FC = () => {
     const { state, dispatch } = React.useContext(Store);
     const [ todo, setTodo ] = React.useState('');
+    const [ hasError, setErrors] = useState(false);
+    const [ planets, setPlanets] = useState({});
     //adding todo dispatch action
     const putData = (e: any) => {
         e.preventDefault()
@@ -23,6 +29,17 @@ const NewItem: React.FC = () => {
           payload: todo
         })
     }
+    async function fetchData() {
+        const res = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/Basic_English');
+        res
+          .json()
+          .then(res => setPlanets(res))
+          .catch(err => setErrors(err));
+    }
+    
+    useEffect(() => {
+        fetchData();
+    });
     //deleting todo dispatch action
     const doneTodo = (index: any) => {
         console.log('index', index);
@@ -76,6 +93,11 @@ const NewItem: React.FC = () => {
             </li>
         ))}
       </ul>
+      <div>
+        <span>{JSON.stringify(planets)}</span>
+        <hr />
+        <span>Has error: {JSON.stringify(hasError)}</span>
+      </div>
       </IonContent>
     </IonPage>
   );
