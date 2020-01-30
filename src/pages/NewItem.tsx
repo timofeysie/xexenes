@@ -62,15 +62,10 @@ const NewItem: React.FC = () => {
       <form id="form">
         <IonItem>
             <IonLabel>Floating Label</IonLabel>
-            <input placeholder="Enter Input" 
+            <IonInput placeholder="Enter Input" 
                 id="todo_input" 
                 type="text"       
-                onChange={(e)=> setTodo(e.target.value)}></input>
-            {/* Causes an "Object is possibly 'null'" error on the event arg */}
-            {/* <IonInput placeholder="Enter Input" 
-                id="todo_input" 
-                type="text"       
-                onChange={(e)=> setTodo(e.target.value)}></IonInput> */}
+                onChange={(e)=> setTodo((e.target as HTMLInputElement).value)}></IonInput>
             <button
                 id="submit_button" 
                 type="submit" 

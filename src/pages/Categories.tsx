@@ -89,16 +89,16 @@ function Categories() {
                onKeyDown={e => handleKeyDown(e, i)}
                onChange={e => updateCategoryAtIndex(e, i)}
              />  
-  <IonLabel>
-    <h1>Create Idea!</h1>
-    <IonNote>Run Idea by Brandy</IonNote>
-  </IonLabel>
-  <IonBadge color="success" slot="end">
-    5 Days
-  </IonBadge>
-      </IonItem>
+            <IonLabel>
+              <h1>Create Idea!</h1>
+              <IonNote>Run Idea by Brandy</IonNote>
+            </IonLabel>
+            <IonBadge color="success" slot="end">
+              5 Days
+            </IonBadge>
+          </IonItem>
         ))}
-</IonList>
+      </IonList>
     </form>
   );
 }
