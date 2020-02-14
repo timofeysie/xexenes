@@ -1,7 +1,6 @@
 import {
   IonBackButton,
   IonButtons,
-  IonButton,
   IonContent,
   IonHeader,
   IonPage,
@@ -11,16 +10,14 @@ import {
 } from '@ionic/react';
 import React from 'react';
 import { Store } from '../store/store';
-import { useReducer, useState, useContext } from 'react';
-import { createContext } from 'react';
-import { Component, useEffect } from "react";
-import { render } from 'react-dom';
+import { useState } from 'react';
+import { useEffect } from "react";
 
 const NewItem: React.FC = () => {
     const { state, dispatch } = React.useContext(Store);
     const [ todo, setTodo ] = React.useState('');
     const [ hasError, setErrors] = useState(false);
-    const [ planets, setPlanets] = useState({});
+    const [ pageSummary, setPageSummary] = useState({});
     //adding todo dispatch action
     const putData = (e: any) => {
         e.preventDefault()
@@ -29,17 +26,21 @@ const NewItem: React.FC = () => {
           payload: todo
         })
     }
+    const updateTodo = (e: any) => {
+     console.log('updated',e);
+    }
     async function fetchData() {
         const res = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/Basic_English');
         res
           .json()
-          .then(res => setPlanets(res))
+          .then(res => setPageSummary(res))
           .catch(err => setErrors(err));
     }
     
     useEffect(() => {
+      console.log('todo',todo);
         fetchData();
-    });
+    }, [todo]);
     //deleting todo dispatch action
     const doneTodo = (index: any) => {
         console.log('index', index);
@@ -65,7 +66,7 @@ const NewItem: React.FC = () => {
             <IonInput placeholder="Enter Input" 
                 id="todo_input" 
                 type="text"       
-                onChange={(e)=> setTodo((e.target as HTMLInputElement).value)}></IonInput>
+                onChange={(e)=> updateTodo(((e.target as HTMLInputElement).value))}></IonInput>
             <button
                 id="submit_button" 
                 type="submit" 
@@ -89,7 +90,7 @@ const NewItem: React.FC = () => {
         ))}
       </ul>
       <div>
-        <span>{JSON.stringify(planets)}</span>
+        <span>{JSON.stringify(pageSummary)}</span>
         <hr />
         <span>Has error: {JSON.stringify(hasError)}</span>
       </div>
