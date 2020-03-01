@@ -106,14 +106,18 @@ const NewItem: React.FC = () => {
             <IonCol>
               <IonRow>
                 <IonCol>
-                  <h3>Search results</h3>
-                  <h5>{pageSummary["description"]}</h5>
-                  <span>{JSON.stringify(pageSummary["extract"])}</span>
-                </IonCol>
-              </IonRow>
-              <IonRow>
-                <IonCol>
-                  {hasError && <span>Error: {JSON.stringify(hasError)}</span>}
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonCardTitle>Search results</IonCardTitle>
+                    </IonCardHeader>
+                    <IonCardContent>
+                      <h5>{pageSummary["description"]}</h5>
+                      <span>{pageSummary["extract"]}</span>
+                      {hasError && (
+                        <span>Error: {JSON.stringify(hasError)}</span>
+                      )}
+                    </IonCardContent>
+                  </IonCard>
                 </IonCol>
               </IonRow>
             </IonCol>

@@ -28,6 +28,21 @@ The app will then open in the default browser at this location:
 http://localhost:8100/home
 ```
 
+Build
+```
+npm run build
+```
+
+Deploy
+```
+firebase deploy
+```
+
+Hosted site:
+
+https://quipu-a1093.firebaseapp.com
+
+
 
 ## Creating a new list
 
@@ -77,6 +92,11 @@ extract: description
 extract_html: description with markup
 ```
 
+Other things to fix:
+* stop multiple items from being added to a list
+* name the list before adding it to the categories
+* remove items from the list
+* change the order of the items
 
 
 ### Element implicitly has an 'any' type because index expression is not of type
@@ -100,6 +120,38 @@ This is what works to add the whole reponse object:
 ```
 
 The idea came from [this SO question](https://stackoverflow.com/questions/59271232/using-usestate-with-react-and-initialise-it-with-blank-object-in-typescript) thanks to the comment by Dupocas on Dec 10 '19 at 16:14.
+
+
+
+### Setting up Firebase
+
+Going the quick and cheap route with Firebase to setup authentication and hosting and get on with storing the lists somewhere.
+
+The initial deployment failed with this error:
+```
+Failed to load resource: the server responded with a status of 400 ()
+/%PUBLIC_URL%/assets/icon/favicon.png:1 Failed to load resource: the server 
+```
+
+The network tab shows:
+```
+Request URL: https://quipu-a1093.firebaseapp.com/%PUBLIC_URL%/assets/icon/favicon.png
+```
+
+Where does the PUBLIC_URL get set?  There are three options for configuring Firebase.  In the docs it says:
+
+*Firebase SDK snippet*
+
+* Automatic
+* CDN
+* Config
+
+*Copy and paste these scripts into the bottom of your <body> tag, but before you use any Firebase services:*
+
+Im assuming, with React and wanting to support local development, the last option is for us.
+
+Using the *[module bundler approach](https://firebase.google.com/docs/web/setup?authuser=0#add-sdks-initialize)* is for npm installation.
+
 
 
 ## Ionic component problems
