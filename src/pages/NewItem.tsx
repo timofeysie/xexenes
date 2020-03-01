@@ -10,7 +10,12 @@ import {
   IonCol,
   IonRow,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle
 } from "@ionic/react";
 import React from "react";
 import { Store } from "../store/store";
@@ -102,6 +107,7 @@ const NewItem: React.FC = () => {
               <IonRow>
                 <IonCol>
                   <h3>Search results</h3>
+                  <h5>{pageSummary["description"]}</h5>
                   <span>{JSON.stringify(pageSummary["extract"])}</span>
                 </IonCol>
               </IonRow>
@@ -122,10 +128,15 @@ const NewItem: React.FC = () => {
                         key={index}
                         // onClick={e => doneTodo(e.target as HTMLElement)}
                       >
-                        <div className="truncate">
-                          {index + 1} {item.title}
-                        </div>
-                        <div className="truncate">{item.extract}</div>
+                        <IonCard>
+                          <IonCardHeader>
+                            <IonCardTitle>{item.title}</IonCardTitle>
+                          </IonCardHeader>
+                          <IonCardContent>
+                            <div className="truncate">{item.description}</div>
+                            <div className="truncate">{item.extract}</div>
+                          </IonCardContent>
+                        </IonCard>
                       </li>
                     ))}
                   </ul>

@@ -28,6 +28,7 @@ The app will then open in the default browser at this location:
 http://localhost:8100/home
 ```
 
+
 ## Creating a new list
 
 This is a work in progress right now on the NewItem component.
@@ -35,6 +36,47 @@ This is a work in progress right now on the NewItem component.
 The NewItem needs to be renamed NewList.
 The two components for the search and list need to be refactored out into two child components, such as Search and List.
 Then, when the user is happy with the list, they need to be able to add it to the main page Categories.
+
+There needs to be components directory and sub-folders to contain the .tsx/.css/.test files for each component.
+
+```
+NewList
+SearchItem
+ItemList
+```
+
+The SearchItem is also going to perform a 'list of x' search on Wikidata and possibly Wikipedia.  The first result ```wikipedia.org/api/rest_v1/page/summary/``` result has the following properties:
+```
+type: "standard"
+title: "x"
+displaytitle: "x"
+namespace: {id: 0, text: ""}
+wikibase_item: "Q564"
+titles: {canonical: "x", normalized: "x", display: "x"}
+pageid: 5098574
+thumbnail: {,…}
+originalimage: {source: "https://upload.wikimedia.org/wikipedia/commons/0/0f/x.jpg",…}
+lang: "en"
+dir: "ltr"
+revision: "942402397"
+tid: "a8d1c7b0-5b16-11ea-baf8-294c9920f812"
+timestamp: "2020-02-24T13:14:10Z"
+description: "..."
+description_source: "local"
+content_urls: {desktop: {page: "https://en.wikipedia.org/wiki/x",
+                mobile: {page: …}
+api_urls: {
+  summary: "https://en.wikipedia.org/api/rest_v1/page/summary/x"
+  metadata: "https://en.wikipedia.org/api/rest_v1/page/metadata/x"
+  references: "https://en.wikipedia.org/api/rest_v1/page/references/x"
+  media: "https://en.wikipedia.org/api/rest_v1/page/media/x"
+  edit_html: "https://en.wikipedia.org/api/rest_v1/page/html/x"
+  talk_page_html: "https://en.wikipedia.org/api/rest_v1/page/html/Talk:x"
+}
+extract: description
+extract_html: description with markup
+```
+
 
 
 ### Element implicitly has an 'any' type because index expression is not of type
