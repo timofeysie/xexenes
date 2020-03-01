@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './Categories.css';
 import { IonList, IonItem, IonCheckbox } from '@ionic/react';
 import { IonLabel, IonNote, IonBadge } from '@ionic/react';
-import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
 
 function Categories() {
   const [categories, setCategories] = useState([

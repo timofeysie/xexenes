@@ -28,6 +28,38 @@ The app will then open in the default browser at this location:
 http://localhost:8100/home
 ```
 
+## Creating a new list
+
+This is a work in progress right now on the NewItem component.
+
+The NewItem needs to be renamed NewList.
+The two components for the search and list need to be refactored out into two child components, such as Search and List.
+Then, when the user is happy with the list, they need to be able to add it to the main page Categories.
+
+
+### Element implicitly has an 'any' type because index expression is not of type
+
+Since we want to add the whole response to the list, which includes a title and description in the 'extract' portion, the way the response was handled had to change.
+
+Trying to put the search results object into the page summary was failing with this error:
+```
+"Element implicitly has an 'any' type because index expression is not of type "number".
+```
+
+This is what was being used to put just a part of the response into the page, but caused that error when the whole response was used:
+```
+  const [pageSummary, setPageSummary] = useState({});
+```
+
+This is what works to add the whole reponse object:
+```
+  type D = { [i: string] : any };
+  const [pageSummary, setPageSummary] = useState<D>({});
+```
+
+The idea came from [this SO question](https://stackoverflow.com/questions/59271232/using-usestate-with-react-and-initialise-it-with-blank-object-in-typescript) thanks to the comment by Dupocas on Dec 10 '19 at 16:14.
+
+
 ## Ionic component problems
 
 While working on issue #3, *Implement categories from a static*, some interesting errors came up with the IonInput and IonButton components.
@@ -89,8 +121,7 @@ const putData = (e: any) => {
 
 Using a regular button calls the same action, but works as expected, so it's probably not the onclick function.  Have to Google this one.
 
-
-
+In the end, I couldn't use the Ionic input, and the whole issue made me question using Ionic with React at this point.  But Ionic 5 is out now, and it's worth upgrading this project to that and try again before giving up.
 
 ### Previous notes
 when trying to use some more Ionic elements like IonInput, this comes up in previously working code, now with a similar error:

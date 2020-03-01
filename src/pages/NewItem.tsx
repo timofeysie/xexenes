@@ -16,34 +16,25 @@ import React from "react";
 import { Store } from "../store/store";
 import { useState } from "react";
 import { useEffect } from "react";
+import "./NewItem.css";
 
 const NewItem: React.FC = () => {
   const { state, dispatch } = React.useContext(Store);
   const [todo, setTodo] = React.useState("");
   const [hasError, setErrors] = useState(false);
-  const [pageSummary, setPageSummary] = useState({});
+  type D = { [i: string]: any };
+  const [pageSummary, setPageSummary] = useState<D>({});
 
   const putData = (e: any) => {
     e.preventDefault();
-    // return dispatch({
-    //   type: 'PUT_DATA',
-    //   payload: todo
-    // })
-    console.log("using", todo);
     fetchData();
   };
   const addItem = (e: any) => {
     e.preventDefault();
-    /** TODO:  Add page summary to the list.
-     * The todo list needs to be converted into a list of items that can include
-     * the page summary, the wikidata query and the Wikipedia list if available.
-     * Current state:
-     * const pageSummary: {}
-Argument of type '{}' is not assignable to parameter of type 'SetStateAction<string>'.
-  Type '{}' is not assignable to type '(prevState: string) => string'.
-    Type '{}' provides no match for the signature '(prevState: string): string'.ts(2345)
-     */
-    //setTodo(pageSummary);
+    return dispatch({
+      type: "PUT_DATA",
+      payload: pageSummary
+    });
   };
   const updateTodo = (e: any) => {
     setTodo(e);
@@ -55,14 +46,19 @@ Argument of type '{}' is not assignable to parameter of type 'SetStateAction<str
     const res = await fetch(base_url + subject);
     res
       .json()
-      .then(res => setPageSummary(res.extract))
+      .then(res => setPageSummary(res))
       .catch(err => setErrors(err));
   }
 
+  /** Should we be fetching anything on load?  Probably not. */
   useEffect(() => {
-    console.log("todo", todo);
     fetchData();
   }, []);
+
+  /**
+   * This can be used when we want to add the list to the categories page.
+   * @param index
+   */
   const doneTodo = (index: any) => {
     console.log("index", index);
     return dispatch({
@@ -102,31 +98,39 @@ Argument of type '{}' is not assignable to parameter of type 'SetStateAction<str
         </form>
         <IonGrid>
           <IonRow>
-            <IonCol class="ion-padding">
-              <h1>List</h1>
-              <ul className="todo_list">
-                {state.todos.map((item: any, index: number) => (
-                  <li
-                    className="todo_item"
-                    value={index}
-                    key={index}
-                    onClick={e => doneTodo(e.target as HTMLElement)}
-                  >
-                    <h3>{item}</h3>
-                  </li>
-                ))}
-              </ul>
-            </IonCol>
-          </IonRow>
-          <IonRow>
             <IonCol>
-              <h3>Summary</h3>
-              <span>{JSON.stringify(pageSummary)}</span>
+              <IonRow>
+                <IonCol>
+                  <h3>Search results</h3>
+                  <span>{JSON.stringify(pageSummary["extract"])}</span>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  {hasError && <span>Error: {JSON.stringify(hasError)}</span>}
+                </IonCol>
+              </IonRow>
             </IonCol>
-          </IonRow>
-          <IonRow>
             <IonCol>
-              <span>Has error: {JSON.stringify(hasError)}</span>
+              <IonRow>
+                <IonCol class="ion-padding">
+                  <ul className="todo_list">
+                    {state.todos.map((item: any, index: number) => (
+                      <li
+                        className="todo_item"
+                        value={index}
+                        key={index}
+                        // onClick={e => doneTodo(e.target as HTMLElement)}
+                      >
+                        <div className="truncate">
+                          {index + 1} {item.title}
+                        </div>
+                        <div className="truncate">{item.extract}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </IonCol>
+              </IonRow>
             </IonCol>
           </IonRow>
         </IonGrid>
