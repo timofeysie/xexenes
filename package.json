@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@firebase/app": "^0.5.5",
     "@ionic/react": "4.11.8",
     "@ionic/react-router": "4.11.8",
     "@types/jest": "24.0.18",

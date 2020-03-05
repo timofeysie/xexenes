@@ -180,6 +180,49 @@ npm ERR! and the repository exists.
 npm ERR! exited with error code: 128
 ```
 
+Strange that permissions are need to install a package.  Push to a repo, yes.  I can push to the GitHub repo fine.  I'm pretty sure that command shuld be:
+```
+npm install @firebase/app
+```
+
+Then the error changes:
+```
+$ ionic build --prod
+> react-scripts build
+Creating an optimized production build...
+Failed to compile.
+/Users/tim/repos/xexenes/src/index.tsx
+TypeScript error in /Users/tim/repos/xexenes/src/index.tsx(23,1):
+Cannot find name 'serviceWorker'. Did you mean 'ServiceWorker'?  TS2552
+    21 | ReactDOM.render(<StoreProvider><App /></StoreProvider>, document.getElementById('root'));
+    22 |
+  > 23 | serviceWorker.register();
+       | ^
+[ERROR] An error occurred while running subprocess react-scripts.      
+        react-scripts build exited with exit code 1.
+```
+
+That's a different issue, with the service worker PWA code from the docs linked to above.
+
+Going without that to see how the build goes now.
+
+The build works:
+```
+The project was built assuming it is hosted at the server root.
+You can control this with the homepage field in your package.json.
+For example, add this to build it for GitHub Pages:
+
+  "homepage" : "http://myname.github.io/myapp",
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+  npm install -g serve
+  serve -s build
+Find out more about deployment here:
+  https://bit.ly/CRA-deploy
+```
+
+Firebase deploy works now, and we have our hosting.  Next, create the CI/CD pipeline to put it to good use.
 
 
 ## Creating a new list
