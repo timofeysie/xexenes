@@ -31,6 +31,7 @@ http://localhost:8100/home
 Build
 ```
 npm run build
+ionic build --prod
 ```
 
 Deploy
@@ -41,6 +42,143 @@ firebase deploy
 Hosted site:
 
 https://quipu-a1093.firebaseapp.com
+
+
+## Setup a CI/CD pipeline using GitHub Actions
+
+As with the [dynamic forms project](https://github.com/timofeysie/dynamic-forms/issues/9), having a pipeline that runs off pull requests is a great addition to a projects workflow.
+
+We can use the same .yml file here with little else needed to set this up.
+
+That project is not deployed on firebase, so we need to go further here and complete the CD portion of the pipeline and deploy the master branch on a successful build.
+
+Before this, the ```npm run build``` doesn't create a build.  Here is the output:
+```
+> react-scripts build
+/Users/tim/repos/xexenes/node_modules/@hapi/joi/lib/types/object/index.js:255
+                        !pattern.schema._validate(key, state, { ...options, abortEarly:true }).errors) {
+                                                                ^^^
+SyntaxError: Unexpected token ...
+    at Object.exports.runInThisContext (vm.js:76:16)
+...
+npm ERR! tea@0.0.1 build: `react-scripts build`
+npm ERR! Exit status 1
+npm ERR!
+npm ERR! Failed at the tea@0.0.1 build script 'react-scripts build'.
+npm ERR! Make sure you have the latest version of node.js and npm installed.
+```
+
+So two things, by default, a new terminal on my old mac doesn't use the latest Node version.  I have to rememer to run ```nvm use 12``` when starting a new terminal.
+
+Second, use the Ionic CLI build process, since I keep forgetting, for better or for worse, this is an Ionic project.
+```
+ionic build --prod
+```
+
+This however also fails:
+```
+Cannot find module: 'firebase/app'. Make sure this package is installed.
+You can install this package by running: npm install firebase/app.
+[ERROR] An error occurred while running subprocess react-scripts.
+        react-scripts build exited with exit code 1.
+        Re-running this command with the --verbose flag may provide more information.
+```
+
+Not sure why it suggests ```npm install firebase/app```
+```
+Cannot find module: 'firebase/app'.
+```
+
+There is not much on Google/GitHub/StackOverflow on this.  There are more Angular answers as Ionic has been until recently Angular only.  It might be a TypeScript mismatch, but I am once again reconsidering using Ionic at all for this project.
+
+Starting a new React project with Ionic 5 and running ionic build --prod completes without error, so this may be an option.  The other option is just a vanilla create-react-app version.
+
+It could be an Ionic/React/Typescript/Firebase disconnect that
+
+Using Node v12.9.1.
+The latest Stable release: 13.8.0 / February 6, 2020; 10 days ago
+
+Also get the latest Ionic CLI:
+```
+npm uninstall -g ionic
+npm install -g @ionic/cli
+```
+
+
+The [docs](https://ionicframework.com/docs/react/pwa) say:
+***ionic build --prod and the www directory will be ready to deploy as a PWA.***
+
+So it's not the public directory.  That means we need to change the firebase.json file to this:
+```
+"hosting": {
+  "public": "www",
+```
+
+May as well get the latest Firebase tools also:
+```
+npm install -g firebase-tools
+```
+
+But wait, one of the firebase init questions is:
+*"What do you want to use as your public directory?" Enter "build".*
+
+The docs show this firebase.json:
+```
+{
+  "hosting": {
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Aside from the depoloyment file, with the above updates, the build still fails:
+```
+$ ionic build --prod
+> react-scripts build
+Creating an optimized production build...
+Failed to compile.
+./src/index.tsx
+Cannot find module: 'firebase/app'. Make sure this package is installed.
+You can install this package by running: npm install firebase/app.
+[ERROR] An error occurred while running subprocess react-scripts.
+        react-scripts build exited with exit code 1.      
+        Re-running this command with the --verbose flag may provide more information.
+```
+
+The suggestion:
+```
+npm install firebase/app
+npm ERR! Error while executing:
+npm ERR! /usr/local/bin/git ls-remote -h -t ssh://git@github.com/firebase/app.git
+npm ERR! Warning: Permanently added the RSA host key for IP address '13.237.44.5' to the list of known hosts.
+npm ERR! git@github.com: Permission denied (publickey).
+npm ERR! fatal: Could not read from remote repository.
+npm ERR! Please make sure you have the correct access rights
+npm ERR! and the repository exists.
+npm ERR! exited with error code: 128
+```
 
 
 
@@ -130,7 +268,7 @@ Going the quick and cheap route with Firebase to setup authentication and hostin
 The initial deployment failed with this error:
 ```
 Failed to load resource: the server responded with a status of 400 ()
-/%PUBLIC_URL%/assets/icon/favicon.png:1 Failed to load resource: the server 
+/%PUBLIC_URL%/assets/icon/favicon.png:1 Failed to load resource: the server
 ```
 
 The network tab shows:
@@ -160,8 +298,8 @@ While working on issue #3, *Implement categories from a static*, some interestin
 
 In the NewItem.tsx file render function, using this markup:
 ```html
-<IonInput placeholder="Enter Input" 
-    id="todo_input" 
+<IonInput placeholder="Enter Input"
+    id="todo_input"
     type="text"       
     onChange={(e)=> setTodo(e.target.value)}></IonInput>
 ```
@@ -196,9 +334,9 @@ onChange={(e)=> setTodo((e.target as HTMLInputElement).value)}
 
 Then problem with the IonButton was different.  Strangely it causes a page refresh.  Here is the markup:
 ```html
-<IonButton 
-    id="submit_button" 
-    type="submit" 
+<IonButton
+    id="submit_button"
+    type="submit"
     onClick={(e) => putData(e)}>Add</IonButton>
 ```
 
@@ -221,7 +359,7 @@ In the end, I couldn't use the Ionic input, and the whole issue made me question
 when trying to use some more Ionic elements like IonInput, this comes up in previously working code, now with a similar error:
 ```
 Object is possibly 'null'.  TS2531
-    48 |             <IonInput placeholder="Enter Input" 
+    48 |             <IonInput placeholder="Enter Input"
     49 |                 id="todo_input" type="text"       
   > 50 |                 onChange={(e)=> setTodo(e.target.value)}></IonInput><br/>
        |                                         ^
@@ -334,7 +472,7 @@ And things ran ok.  But who chose the name 'tea' for the project?  I thought it 
 
 While implementing the code to add a category, we are getting this error:
 ```
-Property 'focus' does not exist on type 'Element'. 
+Property 'focus' does not exist on type 'Element'.
 ```
 
 That's coming from this code:
@@ -521,8 +659,8 @@ Had to restart VSCode after this to get some strange editor errors to disappear,
 
 Adding the put and done functions to the new item component was pretty easy.  But in the template we run into this error:
 ```
-<li className="todo_item" 
-    value={index} 
+<li className="todo_item"
+    value={index}
     key={index}
     onClick={(e) => doneTodo(e.target.value)}>
 ```
@@ -555,7 +693,7 @@ What is the type of the list element ```<li>```?
 But the errors are gone and that is good enough for now.  But when trying to use some more Ionic elements like IonInput, this comes up in previously working code, now with a similar error:
 ```
 Object is possibly 'null'.  TS2531
-    48 |             <IonInput placeholder="Enter Input" 
+    48 |             <IonInput placeholder="Enter Input"
     49 |                 id="todo_input" type="text"       
   > 50 |                 onChange={(e)=> setTodo(e.target.value)}></IonInput><br/>
        |                                         ^
@@ -610,7 +748,7 @@ After changing that, running npm i, and starting the ionic serve again, this sho
 TypeScript error in /Users/tim/repos/xexenes/src/App.tsx(28,4):
 Property 'translate' is missing in type '{ children: Element; }' but required in type 'Pick<HTMLAttributes<HTMLIonAppElement>, "title" | "hidden" | "dir" | "slot" | "color" | "children" | "accessKey" | "draggable" | "lang" | "translate" | "className" | "id" | "prefix" | ... 239 more ... | "onTransitionEndCapture">'.  TS2741
 
-    26 | 
+    26 |
     27 | const App: React.FC = () => (
   > 28 |   <IonApp>
        |    ^

@@ -19,3 +19,5 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 ReactDOM.render(<StoreProvider><App /></StoreProvider>, document.getElementById('root'));
+
+serviceWorker.register();
