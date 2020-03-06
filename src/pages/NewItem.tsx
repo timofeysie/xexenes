@@ -14,7 +14,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle
 } from "@ionic/react";
 import React from "react";
@@ -22,6 +21,7 @@ import { Store } from "../store/store";
 import { useState } from "react";
 import { useEffect } from "react";
 import "./NewItem.css";
+import ItemList from './components/items/ItemList';
 
 const NewItem: React.FC = () => {
   const { state, dispatch } = React.useContext(Store);
@@ -124,26 +124,7 @@ const NewItem: React.FC = () => {
             <IonCol>
               <IonRow>
                 <IonCol class="ion-padding">
-                  <ul className="todo_list">
-                    {state.todos.map((item: any, index: number) => (
-                      <li
-                        className="todo_item"
-                        value={index}
-                        key={index}
-                        // onClick={e => doneTodo(e.target as HTMLElement)}
-                      >
-                        <IonCard>
-                          <IonCardHeader>
-                            <IonCardTitle>{item.title}</IonCardTitle>
-                          </IonCardHeader>
-                          <IonCardContent>
-                            <div className="truncate">{item.description}</div>
-                            <div className="truncate">{item.extract}</div>
-                          </IonCardContent>
-                        </IonCard>
-                      </li>
-                    ))}
-                  </ul>
+                  <ItemList />
                 </IonCol>
               </IonRow>
             </IonCol>

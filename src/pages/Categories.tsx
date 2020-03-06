@@ -78,15 +78,15 @@ function Categories() {
   return (
     <form className="category-list">
       <IonList>
-        {categories.map((category, i) => (
-          <IonItem>
+        {categories.map((category, index) => (
+          <IonItem key="{index}">
             <IonCheckbox slot="start"
-                onClick={() => toggleCategoryCompleteAtIndex(i)}></IonCheckbox>
+                onClick={() => toggleCategoryCompleteAtIndex(index)}></IonCheckbox>
             <input
-               type="text"
+               type="text" 
                value={category.content}
-               onKeyDown={e => handleKeyDown(e, i)}
-               onChange={e => updateCategoryAtIndex(e, i)}
+               onKeyDown={e => handleKeyDown(e, index)}
+               onChange={e => updateCategoryAtIndex(e, index)}
              />  
             <IonLabel>
               <h1>Create Idea!</h1>

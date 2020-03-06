@@ -40,6 +40,9 @@
   ],
   "description": "An Ionic project",
   "devDependencies": {
-    "react-scripts": "3.1.2"
+    "@testing-library/react": "^9.5.0",
+    "@types/react-test-renderer": "^16.9.0",
+    "react-scripts": "3.1.2",
+    "react-test-renderer": "^16.9.0"
   }
 }
