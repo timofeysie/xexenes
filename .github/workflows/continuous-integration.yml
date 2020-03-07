@@ -13,7 +13,7 @@ jobs:
         run: npm i
 
       - name: Build
-        run: ionic build
+        run: npm build
 
       - name: Test
         run: CI=true npm test

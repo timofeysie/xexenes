@@ -241,6 +241,13 @@ Find out more about deployment here:
 
 Firebase deploy works now, and we have our hosting.  Next, create the CI/CD pipeline to put it to good use.
 
+At first, replacing npm with Ionic causes this error on GitHub:
+```
+ionic: command not found
+```
+
+I suppose npm build will do.
+
 
 ## Creating a new list
 
