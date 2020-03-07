@@ -241,6 +241,21 @@ Find out more about deployment here:
 
 Firebase deploy works now, and we have our hosting.  Next, create the CI/CD pipeline to put it to good use.
 
+At first, replacing npm with Ionic causes this error on GitHub:
+```
+ionic: command not found
+```
+
+I suppose npm build will do.  Next, the CD part of the pipeline.
+
+*FIREBASE_TOKEN - Required if GCP_SA_KEY is not set. The token to use for authentication. This token can be aquired through the firebase login:ci command.*
+
+This will return a token upon successful login.  Now, regarding that ```secrets.FIREBASE_TOKEN```...  It needs to be added to the reop's [secrets](https://github.com/timofeysie/xexenes/settings/secrets/new).
+
+
+
+
+
 
 ## Creating a new list
 
