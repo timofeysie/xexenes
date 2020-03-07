@@ -252,8 +252,14 @@ I suppose npm build will do.  Next, the CD part of the pipeline.
 
 This will return a token upon successful login.  Now, regarding that ```secrets.FIREBASE_TOKEN```...  It needs to be added to the reop's [secrets](https://github.com/timofeysie/xexenes/settings/secrets/new).
 
+```
+Run npm run build-prod
+npm ERR! missing script: build-prod
+npm ERR! Did you mean this?
+npm ERR!     build
+```
 
-
+Whoops!
 
 
 
