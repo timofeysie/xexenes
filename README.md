@@ -44,6 +44,23 @@ Hosted site:
 https://quipu-a1093.firebaseapp.com
 
 
+
+## TODO
+
+* The item list cards need a remove icon
+* Item list cards click should lead to a details page
+* Failed searches need an error message
+* The NewItem needs to be renamed NewList.
+* Rename todo list
+* Add list to the main page Categories.
+* Perform a 'list of x' search on Wikidata and possibly Wikipedia. 
+* Stop multiple items from being added to a list
+* Name the list before adding it to the categories
+* Change the order of the items
+* Add login module and route guard
+* Save categories and lists to the db
+
+
 ## Setup a CI/CD pipeline using GitHub Actions
 
 As with the [dynamic forms project](https://github.com/timofeysie/dynamic-forms/issues/9), having a pipeline that runs off pull requests is a great addition to a projects workflow.
@@ -223,6 +240,21 @@ Find out more about deployment here:
 ```
 
 Firebase deploy works now, and we have our hosting.  Next, create the CI/CD pipeline to put it to good use.
+
+At first, replacing npm with Ionic causes this error on GitHub:
+```
+ionic: command not found
+```
+
+I suppose npm build will do.  Next, the CD part of the pipeline.
+
+*FIREBASE_TOKEN - Required if GCP_SA_KEY is not set. The token to use for authentication. This token can be aquired through the firebase login:ci command.*
+
+This will return a token upon successful login.  Now, regarding that ```secrets.FIREBASE_TOKEN```...  It needs to be added to the reop's [secrets](https://github.com/timofeysie/xexenes/settings/secrets/new).
+
+
+
+
 
 
 ## Creating a new list

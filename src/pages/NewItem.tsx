@@ -105,7 +105,7 @@ const NewItem: React.FC = () => {
           <IonRow>
             <IonCol>
               <IonRow>
-                <IonCol>
+                <IonCol size="auto">
                   <IonCard>
                     <IonCardHeader>
                       <IonCardTitle>Search results</IonCardTitle>
