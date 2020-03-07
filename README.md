@@ -44,6 +44,23 @@ Hosted site:
 https://quipu-a1093.firebaseapp.com
 
 
+
+## TODO
+
+* The item list cards need a remove icon
+* Item list cards click should lead to a details page
+* Failed searches need an error message
+* The NewItem needs to be renamed NewList.
+* Rename todo list
+* Add list to the main page Categories.
+* Perform a 'list of x' search on Wikidata and possibly Wikipedia. 
+* Stop multiple items from being added to a list
+* Name the list before adding it to the categories
+* Change the order of the items
+* Add login module and route guard
+* Save categories and lists to the db
+
+
 ## Setup a CI/CD pipeline using GitHub Actions
 
 As with the [dynamic forms project](https://github.com/timofeysie/dynamic-forms/issues/9), having a pipeline that runs off pull requests is a great addition to a projects workflow.
