@@ -80,8 +80,6 @@ function Categories() {
       <IonList>
         {categories.map((category, index) => (
           <IonItem key="{index}">
-            <IonCheckbox slot="start"
-                onClick={() => toggleCategoryCompleteAtIndex(index)}></IonCheckbox>
             <input
                type="text" 
                value={category.content}

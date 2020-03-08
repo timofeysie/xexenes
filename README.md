@@ -50,6 +50,8 @@ https://quipu-a1093.firebaseapp.com
 * The item list cards need a remove icon
 * Item list cards click should lead to a details page
 * Failed searches need an error message
+* write tests for the Home page and the Categories component
+* move the category component into the components directory
 * The NewItem needs to be renamed NewList.
 * Rename todo list
 * Add list to the main page Categories.
@@ -59,6 +61,28 @@ https://quipu-a1093.firebaseapp.com
 * Change the order of the items
 * Add login module and route guard
 * Save categories and lists to the db
+
+
+## Refactoring the home page
+
+The initial Ionic demo had this slick to do checklist.  We don't need it anymore.  The home page needs to show a list of lists.  The create new fab button leads to the search/add to list page.  This page needs to let the user create a list from various methods and then name and add that list to the home page.
+
+The home page list is called categories.  We will need to do some renaming of the current setup to get away from the stock todo samples used to get started a few months ago when this project source was created.
+
+The todos are help in the store.todos.  We will skip a separate input for now to add a name to the category list.  Just take what is in the search input field and assume the user knows what they are doing by saving the list namved whatever is in the field.  Probably we will make another input somewhere on that page, but this seems kind of wrong, so I'm hoping a better idea will come along.
+
+So, how to pass the name in the input back along to the Categories list when the home page is navigated to?
+
+I guess we could keep the categories in the store also.  But, acutally, do we need Redux?  Many are questioning it now with the enlightend state of hooks in React.  On the other hand, there are a lot of Redux apps out there and jobs that assume a thorough understanding of it.  Since I code as a contractor, this matters.  Having hands on experience with Redux is still an issue.  And don't forget the awsome dev tools and state time travelling.  That has to be worth something.
+
+So it's with this background that we need to think about a solution here.
+
+What is the simplest solution given what we have?
+
+The categories has JSON that is geared towards a SPARQL call to get a list of something from Wikidata.  It was never finished, but basically, that functionality needs to be in a separate component.  We want Wikidata and Wikimedia content in the new item page.
+
+And the category component doesn't even seem to be appearing on the home page.
+
 
 
 ## Setup a CI/CD pipeline using GitHub Actions
@@ -259,13 +283,27 @@ npm ERR! Did you mean this?
 npm ERR!     build
 ```
 
-Whoops!
+Whoops!  And another whoops:
+```
+@github-actions
+github-actions
+/ Build
+.github
+Path does not exist /home/runner/work/xexenes/xexenes/dist
+```
 
+Change that to build and getting this check failure:
+```
+.github/workflows/continuous-deployment.yml
+Invalid Workflow File
+DETAILS
+every step must define a uses or run key
+```
+
+Errors that are on line one but not on line one are annoying.  I guess this is a yaml thing.
 
 
 ## Creating a new list
-
-This is a work in progress right now on the NewItem component.
 
 The NewItem needs to be renamed NewList.
 The two components for the search and list need to be refactored out into two child components, such as Search and List.

@@ -23,13 +23,18 @@ import { useEffect } from "react";
 import "./NewItem.css";
 import ItemList from './components/items/ItemList';
 
-const NewItem: React.FC = () => {
+const NewItem: React.FC = (props: any) => {
   const { state, dispatch } = React.useContext(Store);
   const [todo, setTodo] = React.useState("");
   const [hasError, setErrors] = useState(false);
   type D = { [i: string]: any };
   const [pageSummary, setPageSummary] = useState<D>({});
-
+  const saveList = (e: any) => {
+    e.preventDefault();
+    console.log('todo',todo);
+    console.log('state',state)
+    props.history.push('/home');
+  }
   const putData = (e: any) => {
     e.preventDefault();
     fetchData();
@@ -86,7 +91,7 @@ const NewItem: React.FC = () => {
           <IonItem>
             <IonLabel>Floating Label</IonLabel>
             <input
-              placeholder="Enter Input"
+              placeholder="Wikipedia API search"
               id="todo_input"
               type="text"
               onChange={e => {
@@ -97,7 +102,10 @@ const NewItem: React.FC = () => {
               Search
             </button>
             <button id="submit_button" type="submit" onClick={e => addItem(e)}>
-              Add
+              Add to list
+            </button>
+            <button id="submit_button" type="submit" onClick={e => saveList(e)}>
+              Save list
             </button>
           </IonItem>
         </form>
