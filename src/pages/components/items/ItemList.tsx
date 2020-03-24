@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Store } from "../../../store/store";
 import {
   IonCard,
@@ -18,7 +18,6 @@ const ItemList = () => {
             className="todo_item"
             value={index}
             key={index}
-            // onClick={e => doneTodo(e.target as HTMLElement)}
           >
             <IonCard>
               <IonCardHeader>

@@ -50,6 +50,8 @@ https://quipu-a1093.firebaseapp.com
 * The item list cards need a remove icon
 * Item list cards click should lead to a details page
 * Failed searches need an error message
+* write tests for the Home page and the Categories component
+* move the category component into the components directory
 * The NewItem needs to be renamed NewList.
 * Rename todo list
 * Add list to the main page Categories.
@@ -59,6 +61,172 @@ https://quipu-a1093.firebaseapp.com
 * Change the order of the items
 * Add login module and route guard
 * Save categories and lists to the db
+
+
+## Item list cards click should lead to a details page
+
+We want to put pages in their own directory to contain all the related files like a feature directory structure.  I assume the CLI scaffold command would be something like this:
+```
+ionic generate component details/details
+```
+
+It shows this output:
+```
+[ERROR] Cannot perform generate for React projects.
+
+        Since you're using the React project type, this command won't work. The Ionic CLI doesn't know how to generate
+        framework components for React projects.
+```
+
+Hahaha.  OK.  Well, it was worth a try.
+
+Creating a page by hand, it is in the Categories.tsx that the user selects and item to display the details for.  However, this is the current TS error from this line:
+```
+setCategories(newCategories[i]);
+```
+
+Causes this:
+```
+const newCategories: {
+    content: string;
+    name: string;
+    label: string;
+    language: string;
+    wd: string;
+    wdt: string;
+    isCompleted: boolean;
+}[]
+Argument of type '{ content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }' is not assignable to parameter of type 'SetStateAction<{ content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }[]>'.
+  Type '{ content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }' is not assignable to type '(prevState: { content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }[]) => { content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }[]'.
+    Type '{ content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }' provides no match for the signature '(prevState: { content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }[]): { content: string; name: string; label: string; language: string; wd: string; wdt: string; isCompleted: boolean; }[]'.ts(2345)
+Peek Problem
+No quick fixes available
+```
+
+It's not very helpful unless you can remove all the specific propterties there and see the error like this:
+```
+Argument of type '{ ... }[]>'.
+Type '{ ... }' is not assignable to type '(prevState: { ... }[]) => { ... }[]'.
+Type '{ ... }' provides no match for the signature '(prevState: { ... }[]): { ... }[]'.
+ts(2345)
+```
+
+If that's what we wanted to do, I think we need to use the spread operator to serve as the previous state.  As it is, the summary info is fetched via either the name, label, or content property of a category.
+
+What we need is just to route to the details page and let that page use this object to do it's stull.
+
+Assuming you can just do something like this is a mistake:
+```TypeScript
+props.history.push('/details');
+```
+
+```
+Categories.tsx:36 Uncaught TypeError: Cannot read property 'push' of undefined
+```
+
+Using routerLink="/details" will work to go to the new page, once the route is defined in the App.tsx router outlet.  But, since there is no parent child between pages, we can't use props to pass down the selected category.  
+
+This method doesn't work:
+```TypeScript
+        <IonItem key={index} routerLink="/details"
+            render={props => (<Details {...props} category={category}/>)}>
+```
+
+It gives us another sprawling TypeScript editor error:
+```
+Type '{ children: Element[]; key: number; routerLink: string; render: (props: any) => Element; }' is not assignable to type 'IntrinsicAttributes & Pick<IonItem, "button" | "color" | "disabled" | "lines" | "mode" | "href" | "download" | "rel" | "target" | "type" | "detail" | "detailIcon"> & { ...; } & Pick<...> & IonicReactProps & RefAttributes<...>'.
+  Property 'render' does not exist on type 'IntrinsicAttributes & Pick<IonItem, "button" | "color" | "disabled" | "lines" | "mode" | "href" | "download" | "rel" | "target" | "type" | "detail" | "detailIcon"> & { ...; } & Pick<...> & IonicReactProps & RefAttributes<...>'.ts(2322)
+```
+
+Sorry, what?
+```
+Type '{ ...  (props: any) => Element; }' is not assignable to type 'IntrinsicAttributes & Pick<IonItem, "button" ... "detailIcon"> & { ...; } & Pick<...> & IonicReactProps & RefAttributes<...>'.
+Property 'render' does not exist on type 'IntrinsicAttributes & Pick<IonItem, "button" | "color" ... "detailIcon"> & { ...; } & Pick<...> & IonicReactProps & RefAttributes<...>'.ts(2322)
+```
+
+Still doesn't help understand what's the issue there.
+
+Also, we want to be able to share routes with params.  This means passing the category id in the route, and extracting the category object again from the state.  It might be easier to do this as a React website might, which is to use props and heirarchy.  But we are using Ionic for it's powerful mobile first approach, which means the page transitions that a mobile user expects from a native app are provided out of the box by Ionic when using the router.
+
+Back to the link.
+
+I don't have too much experience with the React router.  SInce routerLinke worked with a basic link, we should be able to pass the category like this:
+```
+<IonItem key={index} routerLink="/details/{category.name}">
+```
+
+But the variable is not interpolated.  Turns out we need to use template literals like this:
+```
+`/details/${category.name}`
+```
+
+But that doesn't work either.  Looking around, there are examples that show using a Link tag like this:
+```
+<Link to={`/details/${category.name}`}>{category.content}</Link>
+```
+
+But TypeScript doesn't like that:
+```
+JSX element type 'Link' does not have any construct or call signatures.ts(2604)
+```
+
+Given that Ionic provides a wrapper around the react-router, this may not be the way to go.  Google knows nothing about this error specific to link.
+
+The specific example from the Ionic docs shows the same error:
+```
+<Link to="/dashboard/users/1">User 1</Link>
+```
+
+And there is no example of interpolation there.  Time for work now.  Will finish this part up later.
+
+
+
+
+## Refactoring the home page
+
+The initial Ionic demo had this slick to do checklist.  We don't need it anymore.  The home page needs to show a list of lists.  The create new fab button leads to the search/add to list page.  This page needs to let the user create a list from various methods and then name and add that list to the home page.
+
+The home page list is called categories.  We will need to do some renaming of the current setup to get away from the stock todo samples used to get started a few months ago when this project source was created.
+
+The todos are help in the store.todos.  We will skip a separate input for now to add a name to the category list.  Just take what is in the search input field and assume the user knows what they are doing by saving the list namved whatever is in the field.  Probably we will make another input somewhere on that page, but this seems kind of wrong, so I'm hoping a better idea will come along.
+
+So, how to pass the name in the input back along to the Categories list when the home page is navigated to?
+
+I guess we could keep the categories in the store also.  But, acutally, do we need Redux?  Many are questioning it now with the enlightend state of hooks in React.  On the other hand, there are a lot of Redux apps out there and jobs that assume a thorough understanding of it.  Since I code as a contractor, this matters.  Having hands on experience with Redux is still an issue.  And don't forget the awsome dev tools and state time travelling.  That has to be worth something.
+
+So it's with this background that we need to think about a solution here.
+
+What is the simplest solution given what we have?
+
+The categories has JSON that is geared towards a SPARQL call to get a list of something from Wikidata.  It was never finished, but basically, that functionality needs to be in a separate component.  We want Wikidata and Wikimedia content in the new item page.
+
+And the category component doesn't even seem to be appearing on the home page.
+
+The work for this refactor is now broken up into three separate issues.
+
+Item list cards click should lead to a details page
+
+* Create an item detail page #19
+* Create a page summary component #20
+* Fetch a list of wikidata items for the selected category #4
+
+THe directory structure, for better or worse, will look like this:
+```
+.
+├── Pages
+|   ├── components
+|   |   ├── items
+|   |   ├── summary
+|   |   └── wikidata
+|   ├── categories
+|   ├── Details
+|   ├── Home
+|   ├── NewItem
+```
+
+I can see a problem already in that items contains an ItemList component.  Unless a sub category is needed there, it should be renamed item-list.  It is used on the categories and new item page
+
+The pages seem like they should be in their own directories, and should be unit tested.  Like any good feature module, they will contain x.tsx, x.css, x.test.tsx, x.util.js type files.
 
 
 ## Setup a CI/CD pipeline using GitHub Actions
@@ -259,13 +427,27 @@ npm ERR! Did you mean this?
 npm ERR!     build
 ```
 
-Whoops!
+Whoops!  And another whoops:
+```
+@github-actions
+github-actions
+/ Build
+.github
+Path does not exist /home/runner/work/xexenes/xexenes/dist
+```
 
+Change that to build and getting this check failure:
+```
+.github/workflows/continuous-deployment.yml
+Invalid Workflow File
+DETAILS
+every step must define a uses or run key
+```
+
+Errors that are on line one but not on line one are annoying.  I guess this is a yaml thing.
 
 
 ## Creating a new list
-
-This is a work in progress right now on the NewItem component.
 
 The NewItem needs to be renamed NewList.
 The two components for the search and list need to be refactored out into two child components, such as Search and List.
