@@ -179,6 +179,52 @@ The specific example from the Ionic docs shows the same error:
 
 And there is no example of interpolation there.  Time for work now.  Will finish this part up later.
 
+This works to change the url, but the page doesn't change.
+```
+import { Link as RouterLink } from 'react-router-dom';
+...
+<RouterLink to={category.name}>{category.content}</RouterLink>
+```
+
+This works to change the route, but the variable doesn't get interpolated.  Can't we have both?  What's going on here?
+
+It seems like the docs didn't help to much to show what seems like a pretty basic case.  Maybe there are a few ways to do the same thing.  Anyhow, after a bit of trial and error, we get something that works that seems obvious now:
+```
+<RouterLink to={'/details/'+category.name}>{category.content}</RouterLink>
+```
+
+Now, on the item details page, we can use that name value to get a Wikipedia summary to display, and also, get the appropriate category and make a SPARQL call to Wikidata with the details from the category object.  Right now, the summary is in the Details page, but after we get that working, we want to move that into it's own component, and also make a component for the Wikidata info.
+
+We could use Redux to share the state between the two pages, or we could roll our own hook.
+
+To create a solution which shares state between components, we could create a custom Hook. *The idea is to create an array of listeners and only one state object. Every time that one component changes the state, all subscribed components get their setState() functions fired and get updated.* [source](https://medium.com/javascript-in-plain-english/state-management-with-react-hooks-no-redux-or-context-api-8b3035ceecf8).
+
+We already have a store, with a category type based on a todo example from last year.  It might be a good idea to dust that off and put it to use here.  
+
+We only have two actions for now:
+```
+PUT_DATA
+OPEN_CATEGORY
+```
+
+The open category was called done todo before.  We don't really need a done, but we do need a count of how many times the category has been viewed.  So maybe a increment category action would be better.  But we are getting further away from just getting the selected category object in the details page, so one thing at a time.
+
+We already have the app wrapped in the <StoreProvider> tag.
+
+That is the first step from [the official docs](https://react-redux.js.org/api/hooks).  This will have to be another issue for another time.  At least with have a details page now with routing and the category in the URI.
+
+It might be good to preuse the [original article on using Redux hooks](https://medium.com/@akshayjpatil11/implementing-redux-architecture-using-react-hooks-39b47762a2fb) that shows how to setup react-redux.
+
+[Create an item detail page #19](https://github.com/timofeysie/xexenes/issues/19) is now halfway there.
+
+Realted to #10 Refactor the home page
+
+To get the category selected, other than the route param, it might be a good idea to also set the selected object in the store also, so that the details page doesn't have to loop over all the categories to get the one selected.  Just seems like a prudent thing to do.  
+
+It will duplicate the object, which is kind of an anti-pattern, ie: storing something that you can re-generate.  Not sure what is the best practice here.  We will start with a forEach solution and replace that when the best solution emerges.
+
+
+
 
 
 

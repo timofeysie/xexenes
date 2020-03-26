@@ -14,20 +14,29 @@ import {
   IonCardHeader,
   IonCardTitle
 } from "@ionic/react";
-import React from "react";
+import React, { useContext} from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
 import "./NewItem.css";
+import { Store } from "../store/store";
 
-const Details: React.FC = () => {
+const Details: React.FC = (props: any) => {
+  const category = props.match.params.category;
+  const { state } = useContext(Store);
   const [todo] = React.useState("");
   const [hasError, setErrors] = useState(false);
   type D = { [i: string]: any };
   const [pageSummary, setPageSummary] = useState<D>({});
 
   async function fetchData() {
+    state.categories.forEach((item: any) => {
+      if (item.name === category) {
+        console.log('item', item, category);
+        // get WIkidata list
+      }
+    });
     const base_url = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-    const subject = todo !== "" ? todo : "Basic_English";
+    const subject = category !== "" ? category : "Basic_English";
     const res = await fetch(base_url + subject);
     res
       .json()

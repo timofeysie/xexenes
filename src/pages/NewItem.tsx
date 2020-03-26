@@ -65,17 +65,6 @@ const NewItem: React.FC = (props: any) => {
     fetchData();
   }, []);
 
-  /**
-   * This can be used when we want to add the list to the categories page.
-   * @param index
-   */
-  const doneTodo = (index: any) => {
-    console.log("index", index);
-    return dispatch({
-      type: "DONE_TODO",
-      payload: index.value
-    });
-  };
   return (
     <IonPage>
       <IonHeader>
