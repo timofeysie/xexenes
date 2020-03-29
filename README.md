@@ -63,6 +63,269 @@ https://quipu-a1093.firebaseapp.com
 * Save categories and lists to the db
 
 
+## Testing useContext
+
+When deploying the changes to add a detail page which reads the store for which detail to display, the tests failed as the good CI caught this error:
+
+```
+  TypeError: Cannot read property 'categories' of undefined
+    10 |     <form className="category-list">
+    11 |       <IonList>
+  > 12 |         {state.categories.map((category: any, index: any) => (
+       |                ^
+    13 |         <IonItem key={index}>
+    14 |             <RouterLink to={'/details/'+category.name}>{category.content}</RouterLink>
+    15 |             <IonBadge color="success" slot="end">
+```
+
+Since the state is ultimately changed in the root parent component and then passed to the provider which then passes it to all child components, do we need to render the Categories.tsx component to make the categories available in the test?
+
+The decision to use context is to avoid 'prop drilling' (passing down through every component in the hierarchy), so we pass the “API object” via React Context with the useContext Hook.
+
+*jest.mock and friends are extremely helpful for many test scenarios, but context is not one of them.*
+
+So that is out of the question.  We are supposed to test code the way it is used, which means yes, we should render the Categories.tsx component to test the Details.tsx component.
+
+But we are not testing the Details component.  The only test right now is for the App.tsx file.
+
+It's embarrassing, yes, but this is all there is:
+```TypeScript
+it('renders without crashing', () => {
+  const div = document.createElement('div');
+  ReactDOM.render(<App />, div);
+  ReactDOM.unmountComponentAtNode(div);
+});
+```
+
+Opened issue #23 for this.  OK, and there is another test, ItemList.test.tsx.  It's time to get this project in order and get some decent tests passing.
+
+Getting back to the App.test.tsx, using the method outlined in [this article](https://www.polvara.me/posts/mocking-context-with-react-testing-library/), this error shows up:
+```
+  Invariant Violation: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+  1. You might have mismatching versions of React and the renderer (such as React DOM)
+  2. You might be breaking the Rules of Hooks
+  3. You might have more than one copy of React in the same app
+  See https://fb.me/react-invalid-hook-call for tips about how to debug and fix this problem.
+      6 |
+      7 | function renderCategories(cats: any) {
+   >  8 |   const { state } = useContext(Store);
+```
+
+Since that is in a function, it's not breaking the rules of hooks.  I might be 1. or 3.
+Going to that link, we see an reason for 1:
+*You might be using a version of react-dom (< 16.8.0)*
+Nope: "react-dom": "^16.9.0",
+
+Number two seems unlikely as it's in a function and called at the top level.  It's also not in a class components, not called in an event handler and not called inside a function passed to useMemo, useReducer, or useEffect.  These are the rules of hooks it mentions.
+
+It mentions a linter for these rules: *You can use the eslint-plugin-react-hooks plugin to catch some of these mistakes.*
+
+That sounds good and is worth looking into, but would be a red herring right now.
+
+So looking at point 3.  The link says:
+```
+Duplicate React
+In order for Hooks to work, the react import from your application code needs to resolve to the same module as the react import from inside the react-dom package.
+
+If these react imports resolve to two different exports objects, you will see this warning. This may happen if you accidentally end up with two copies of the react package.
+```
+
+You can run this check in the project folder to find out.
+```
+> npm ls react
+tea@0.0.1 C:\Users\timof\repos\timofeysie\xexenes
+`-- react@16.9.0
+```
+
+No duplicates there.  So what gives?
+
+There might be other ways to have a duplicate.  For example, we have two different render sections on the page after trying out the recommended approach from the article first linked above.
+
+import ReactDOM from 'react-dom';
+import { render } from '@testing-library/react';
+...
+  const { state } = useContext(Store);
+  return render(
+    ...
+  const div = document.createElement('div');
+  ReactDOM.render(<App />, div);
+
+However, doing the same using ReactDOM for the createElement() function doesn't help:
+```
+  const div = document.createElement('div');
+  ReactDOM.render(
+```
+
+This is the app we are talking about.  I think normally you do a lot of unit testing on the app.  I might also point out that the app is running fine.  This is one of the things that brings me down about unit testing.  I like it, but not when the app runs fine, but the tests don't, and you have to spend ours fixing tests that are just supposed to be confirming app behavior, not taking on a life of their own and sucking development time.  Rant over, it's time to suck some more time with a google search.
+
+In [a Spectrum chat](https://spectrum.chat/testing-library/general/how-i-mock-usecontext~c9402322-862e-46b4-aa8b-1aece66953cf), someone says *I would advise not to (mock the context). It's much easier to render it in your test*:
+```
+render(<Context.Provider value={'a value that makes sense'}><Search /></Context.Provider>)
+```
+
+*In this way your component is interactive with a real context*
+
+The next question is, what is Context, which is answered luckily with some code:
+https://github.com/iamgbayer/contributed/blob/master/src/state/context.tsx#L11
+
+That looks like a good approach, but I have a feeling that I shouldn't be writing this kind of test for the App.tsx file.  My gut feeling is that if it('renders without crashing'), then it's job is done.  We don't want to be doing e2e testing there, and unit tests should be done on a lower component level.  How to solve this error might require a StackOverflow question to see what the community thinks about the above.
+
+Looking at what others have tested in the App.tsx file, I found [this What's App clone](https://www.tortilla.academy/Urigo/WhatsApp-Clone-Tutorial/master/0.1.0/diff/0.2.0) that uses Apollo.
+```TypeScript
+import React from 'react';
+import { ApolloProvider } from '@apollo/react-hooks';
+import ReactDOM from 'react-dom';
+import App from './App';
+import { mockApolloClient } from './test-helpers';
+import * as subscriptions from './graphql/subscriptions';
+it('renders without crashing', () => {
+  const client = mockApolloClient([
+    {
+      request: { query: subscriptions.messageAdded },
+      result: { data: {} }
+    }
+  ]);
+  const div = document.createElement('div');
+  ReactDOM.render(
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>,
+    div
+  );
+  ReactDOM.unmountComponentAtNode(div);
+});
+```
+
+Notice that contrary to the advice we read before, a mock is used.
+However, it does not mention useContext there at all.  It is used in a different part of the app like this:
+```TypeScript
+const pagination = useContext(PaginationContext);
+```
+
+
+Here is a more interesting example:
+```TypeScript
+import React from 'react'
+import { render } from '@testing-library/react'
+import App from './App'
+import { User } from './context'
+import { userMock, userMockConnected } from '../__mocks__/user-mock'
+
+describe('App', () => {
+    it('renders without crashing', () => {
+        const { container } = render(
+            <User.Provider value={userMockConnected}>
+                <App />
+            </User.Provider>
+        )
+        expect(container.firstChild).toBeInTheDocument()
+    })
+
+    it('renders loading state', () => {
+        const { container } = render(
+            <User.Provider value={{ ...userMock, isLoading: true }}>
+                <App />
+            </User.Provider>
+        )
+        expect(container.querySelector('.spinner')).toBeInTheDocument()
+    })
+})
+```
+Not sure about [the source of this](https://git.berlin/oceanprotocol/commons/src/commit/a7d6af60065f26236d1f11d599de2cdb22286a23/client/src/App.test.tsx).  I thought maybe the userMockConnected file might help a bit:
+```TypeScript
+const userMockConnected = {
+    isLogged: true,
+    isLoading: false,
+    isBurner: false,
+    isWeb3Capable: true,
+    account: '0xxxxxx',
+    web3: {},
+    ...oceanMock,
+    balance: { eth: 0, ocn: 0 },
+    network: '',
+    requestFromFaucet: jest.fn(),
+    loginMetamask: jest.fn(),
+    loginBurnerWallet: jest.fn(),
+    message: ''
+}
+```
+
+Not really specific to the situation faced here, but it shows that, maybe a mock is what is needed.  Just a mock that provides a categories object might do the trick?
+
+And looking at the error again:
+```
+Cannot read property 'categories' of undefined
+    > 12 |         {state.categories.map((category: any, index: any) => (
+```
+
+State is the thing that is undefined.  How do people mock state in the App.test.tsx file?
+
+Not sure why I have a problem wanting to get into Enzyme.  I guess it's dated now and that everyone is jumping on the react-testing-library, and that going back to Enzyme would be a step backwards.  Anyhow, here is an example of how this is done in with the Enzyme testing framework.
+```
+import Enzyme, { shallow, render, mount } from 'enzyme';
+import toJson from 'enzyme-to-json';
+import Adapter from 'enzyme-adapter-react-16';
+
+Enzyme.configure({ adapter: new Adapter() })
+
+// incorrect function assignment in the onClick method
+// will still pass the tests.
+
+test('the increment method increments count', () => {
+  const wrapper = mount(<Counter />)
+
+  expect(wrapper.instance().state.count).toBe(0)
+
+  // wrapper.find('button.counter-button').simulate('click')
+  // wrapper.setState({count: 1})
+  wrapper.instance().increment()
+  expect(wrapper.instance().state.count).toBe(1)
+})
+```
+
+Looking at [another example](https://stackoverflow.com/questions/57894300/how-to-access-a-specific-reducer-in-react-testing-library), it uses the same method as is used in the ItemList.test.tsx.
+
+```
+function renderWithRedux(
+  { store = createStore(useState) } = {}
+) {
+  return {
+    ...render(<ItemList store={store}></ItemList>),
+    // adding `store` to the returned utilities to allow us
+    // to reference it in our tests (just try to avoid using
+    // this to test implementation details).
+    store,
+  }
+}
+```
+
+Why is the test commented out?  Isn't that a custom hook?  No, there is a [React Redux page talking about it on the official Testing Library docs site](https://testing-library.com/docs/example-react-redux).
+
+But the ``` store={store}``` part causes this error:
+```
+Type '{ children: any; store: Store<[unknown, Dispatch<unknown>], Action<any>>; }' is not assignable to type 'IntrinsicAttributes & { children?: ReactNode; }'.
+  Property 'store' does not exist on type 'IntrinsicAttributes & { children?: ReactNode; }'.ts(2322)
+```
+
+That means there are missing required properties.  React.Component definition is:
+```TypeScript
+interface Component<P = {}, S = {}>
+```
+
+P defines components properties and S the state. You must pass to the component all required properties defined in P.
+
+It's a [TypeScript thing](https://charles-bryant.gitbook.io/hello-react-and-typescript/).
+
+Would like to ignore this for the time being so that the recent changes could be deployed with the wonderful pipeline, but this is not working to skip the error:
+```
+{/* @ts-ignore */}
+```
+
+I'm used to skipping linting errors to get past a blocker, but never a TypeScript error.  Usually, a TS error would impact the runtime, but in this case, that's not the case.
+
+The TS GitHub says *#21602 was not merged. You can't ignore only certain errors.*
+
+
 ## Item list cards click should lead to a details page
 
 We want to put pages in their own directory to contain all the related files like a feature directory structure.  I assume the CLI scaffold command would be something like this:
@@ -103,7 +366,7 @@ Peek Problem
 No quick fixes available
 ```
 
-It's not very helpful unless you can remove all the specific propterties there and see the error like this:
+It's not very helpful unless you can remove all the specific properties there and see the error like this:
 ```
 Argument of type '{ ... }[]>'.
 Type '{ ... }' is not assignable to type '(prevState: { ... }[]) => { ... }[]'.
@@ -146,11 +409,11 @@ Property 'render' does not exist on type 'IntrinsicAttributes & Pick<IonItem, "b
 
 Still doesn't help understand what's the issue there.
 
-Also, we want to be able to share routes with params.  This means passing the category id in the route, and extracting the category object again from the state.  It might be easier to do this as a React website might, which is to use props and heirarchy.  But we are using Ionic for it's powerful mobile first approach, which means the page transitions that a mobile user expects from a native app are provided out of the box by Ionic when using the router.
+Also, we want to be able to share routes with params.  This means passing the category id in the route, and extracting the category object again from the state.  It might be easier to do this as a React website might, which is to use props and hierarchy.  But we are using Ionic for it's powerful mobile first approach, which means the page transitions that a mobile user expects from a native app are provided out of the box by Ionic when using the router.
 
 Back to the link.
 
-I don't have too much experience with the React router.  SInce routerLinke worked with a basic link, we should be able to pass the category like this:
+I don't have too much experience with the React router.  Since routerLink worked with a basic link, we should be able to pass the category like this:
 ```
 <IonItem key={index} routerLink="/details/{category.name}">
 ```
@@ -213,11 +476,11 @@ We already have the app wrapped in the <StoreProvider> tag.
 
 That is the first step from [the official docs](https://react-redux.js.org/api/hooks).  This will have to be another issue for another time.  At least with have a details page now with routing and the category in the URI.
 
-It might be good to preuse the [original article on using Redux hooks](https://medium.com/@akshayjpatil11/implementing-redux-architecture-using-react-hooks-39b47762a2fb) that shows how to setup react-redux.
+It might be good to peruse the [original article on using Redux hooks](https://medium.com/@akshayjpatil11/implementing-redux-architecture-using-react-hooks-39b47762a2fb) that shows how to setup react-redux.
 
 [Create an item detail page #19](https://github.com/timofeysie/xexenes/issues/19) is now halfway there.
 
-Realted to #10 Refactor the home page
+Related to #10 Refactor the home page.
 
 To get the category selected, other than the route param, it might be a good idea to also set the selected object in the store also, so that the details page doesn't have to loop over all the categories to get the one selected.  Just seems like a prudent thing to do.  
 
@@ -234,11 +497,11 @@ The initial Ionic demo had this slick to do checklist.  We don't need it anymore
 
 The home page list is called categories.  We will need to do some renaming of the current setup to get away from the stock todo samples used to get started a few months ago when this project source was created.
 
-The todos are help in the store.todos.  We will skip a separate input for now to add a name to the category list.  Just take what is in the search input field and assume the user knows what they are doing by saving the list namved whatever is in the field.  Probably we will make another input somewhere on that page, but this seems kind of wrong, so I'm hoping a better idea will come along.
+The todos are help in the store.todos.  We will skip a separate input for now to add a name to the category list.  Just take what is in the search input field and assume the user knows what they are doing by saving the list named whatever is in the field.  Probably we will make another input somewhere on that page, but this seems kind of wrong, so I'm hoping a better idea will come along.
 
 So, how to pass the name in the input back along to the Categories list when the home page is navigated to?
 
-I guess we could keep the categories in the store also.  But, acutally, do we need Redux?  Many are questioning it now with the enlightend state of hooks in React.  On the other hand, there are a lot of Redux apps out there and jobs that assume a thorough understanding of it.  Since I code as a contractor, this matters.  Having hands on experience with Redux is still an issue.  And don't forget the awsome dev tools and state time travelling.  That has to be worth something.
+I guess we could keep the categories in the store also.  But, actually, do we need Redux?  Many are questioning it now with the enlightened state of hooks in React.  On the other hand, there are a lot of Redux apps out there and jobs that assume a thorough understanding of it.  Since I code as a contractor, this matters.  Having hands on experience with Redux is still an issue.  And don't forget the awesome dev tools and state time travelling.  That has to be worth something.
 
 So it's with this background that we need to think about a solution here.
 
@@ -299,7 +562,7 @@ npm ERR! Failed at the tea@0.0.1 build script 'react-scripts build'.
 npm ERR! Make sure you have the latest version of node.js and npm installed.
 ```
 
-So two things, by default, a new terminal on my old mac doesn't use the latest Node version.  I have to rememer to run ```nvm use 12``` when starting a new terminal.
+So two things, by default, a new terminal on my old mac doesn't use the latest Node version.  I have to remember to run ```nvm use 12``` when starting a new terminal.
 
 Second, use the Ionic CLI build process, since I keep forgetting, for better or for worse, this is an Ionic project.
 ```
@@ -384,7 +647,7 @@ The docs show this firebase.json:
 }
 ```
 
-Aside from the depoloyment file, with the above updates, the build still fails:
+Aside from the deployment file, with the above updates, the build still fails:
 ```
 $ ionic build --prod
 > react-scripts build
@@ -411,7 +674,7 @@ npm ERR! and the repository exists.
 npm ERR! exited with error code: 128
 ```
 
-Strange that permissions are need to install a package.  Push to a repo, yes.  I can push to the GitHub repo fine.  I'm pretty sure that command shuld be:
+Strange that permissions are need to install a package.  Push to a repo, yes.  I can push to the GitHub repo fine.  I'm pretty sure that command should be:
 ```
 npm install @firebase/app
 ```
@@ -462,9 +725,9 @@ ionic: command not found
 
 I suppose npm build will do.  Next, the CD part of the pipeline.
 
-*FIREBASE_TOKEN - Required if GCP_SA_KEY is not set. The token to use for authentication. This token can be aquired through the firebase login:ci command.*
+*FIREBASE_TOKEN - Required if GCP_SA_KEY is not set. The token to use for authentication. This token can be acquired through the firebase login:ci command.*
 
-This will return a token upon successful login.  Now, regarding that ```secrets.FIREBASE_TOKEN```...  It needs to be added to the reop's [secrets](https://github.com/timofeysie/xexenes/settings/secrets/new).
+This will return a token upon successful login.  Now, regarding that ```secrets.FIREBASE_TOKEN```...  It needs to be added to the repos [secrets](https://github.com/timofeysie/xexenes/settings/secrets/new).
 
 ```
 Run npm run build-prod
@@ -560,7 +823,7 @@ This is what was being used to put just a part of the response into the page, bu
   const [pageSummary, setPageSummary] = useState({});
 ```
 
-This is what works to add the whole reponse object:
+This is what works to add the whole response object:
 ```
   type D = { [i: string] : any };
   const [pageSummary, setPageSummary] = useState<D>({});
@@ -686,7 +949,7 @@ Object is possibly 'null'.  TS2531
 
 This is a [classic StackOverflow answer](): *This feature is called "strict null checks", to turn it off ensure that the --strictNullChecks compiler flag is not set.  However, the existence of null has been described as The Billion Dollar Mistake, so it is exciting to see languages such as TypeScript introducing a fix.*
 
-But for us, in this case, it as a new Redux Hook, not our own defined constant.  So thie same solution doesn't work:
+But for us, in this case, it as a new Redux Hook, not our own defined constant.  The same solution doesn't work:
 ```
 setTodo(e.target.value as HTMLElement)
 ```
@@ -697,7 +960,7 @@ Argument of type 'HTMLElement' is not assignable to parameter of type 'SetStateA
   Type 'HTMLElement' is not assignable to type 'string'.ts(2345)
 ```
 
-Tried this schenanigan:
+Tried this shenanigan:
 ```
 setTodo(e.target.value !== null ? e.target.value : ''
 ```
@@ -746,7 +1009,7 @@ But in React these days you write this at the *end* of the file:
 export default Categories
 ```
 
-Not sure why you can't just wirte on one line:
+Not sure why you can't just write on one line:
 ```
 export default function Categories() {
 ```  
@@ -801,7 +1064,7 @@ let element = document.forms[0].elements[i + 1] as HTMLElement;
 element.focus();
 ```
 
-That's TyhpeScript.  We have also been getting issues like this:
+That's TypeScript.  We have also been getting issues like this:
 ```
 Parameter 'index' implicitly has an 'any' type.  TS7006
 ```
@@ -964,7 +1227,7 @@ export function chatReducer(
 Had to restart VSCode after this to get some strange editor errors to disappear, and then all runs fine.  On with the show.
 
 
-### Build the components, *the Billion Dollar Mistake* and page refresing buttons
+### Build the components, *the Billion Dollar Mistake* and page refreshing buttons
 
 Adding the put and done functions to the new item component was pretty easy.  But in the template we run into this error:
 ```
@@ -1020,7 +1283,7 @@ Object is possibly 'null'.  TS2531
 
 This is a [classic StackOverflow answer](): *This feature is called "strict null checks", to turn it off ensure that the --strictNullChecks compiler flag is not set.  However, the existence of null has been described as The Billion Dollar Mistake, so it is exciting to see languages such as TypeScript introducing a fix.*
 
-But for us, in this case, it as a new Redux Hook, not our own defined constant.  So thie same solution doesn't work:
+But for us, in this case, it as a new Redux Hook, not our own defined constant.  The same solution doesn't work:
 ```
 setTodo(e.target.value as HTMLElement)
 ```
@@ -1031,7 +1294,7 @@ Argument of type 'HTMLElement' is not assignable to parameter of type 'SetStateA
   Type 'HTMLElement' is not assignable to type 'string'.ts(2345)
 ```
 
-Tried this schenanigan:
+Tried this shenanigan:
 ```
 setTodo(e.target.value !== null ? e.target.value : ''
 ```
@@ -1116,7 +1379,7 @@ So then why are React developers so down on classes, and what is wrong with Reac
 
 If there is a non-existing battle between Hooks and classes, what does a developer do?
 
-Simplicity is difficult.  It could be that classes encourage inheritance, which, with the drive to reduce repetition in code leads to complex code bases where the depth of a class heirachy makes code hard to reason about.
+Simplicity is difficult.  It could be that classes encourage inheritance, which, with the drive to reduce repetition in code leads to complex code bases where the depth of a class hierarchy makes code hard to reason about.
 
 From the [React webpage](https://reactjs.org/docs/hooks-faq.html#how-to-test-components-that-use-hooks):
 *To reduce the boilerplate, we recommend using react-testing-library which is designed to encourage writing tests that use your components as the end users do.*
