@@ -1,13 +1,29 @@
 # Xexenes
 
-This is an Ionic React app to consume a WikiData list API.
+This is an Ionic React app to provide a configurable list of items from Wikipedia.
 
-Ionic recently released their first official React based framework.  So this project is to explore it with the same functionality implemented in a string of projects starting a year ago that compared and contrasted React, Angular, React Native, Ionic, Electron and other approaches.
+Ionic recently released their first official React based framework.  This project aims to explore it with the same functionality implemented in a string of [similar projects](https://github.com/timofeysie/loranthifolia) starting a year ago that compared and contrasted React, Angular, React Native, Ionic, Electron and other approaches to modern app development.
+
+Ionic React has worked out somewhat.  There seem to be some problems with Ionic components (see below) at the moment, but overall, Ionic is still a great mobile based framework that also works for the web.
+
+React hooks are great.  This app also uses some Redux hooks just as a learning process.  Redux may or may not be really needed for an app this size, but it's OK for learning purposes.
+
 
 ## Table of contents
 
 
 * [Workflow](#workflow)
+* [TODO](#TODO)
+* [Testing useContext](#testing-useContext)
+* [Routing to a details page](#routing-to-a-details-page)
+* [Refactoring the home page](#refactoring-the-home-page)
+* [Setting up a CI/CD pipeline using GitHub Actions](#setting-up-a-CI/CD-pipeline-using-GitHub-Actions)
+* [Creating a new list](#creating-a-new-list)
+* [Ionic component problems](#ionic-component-problems)
+* [Implement categories from a static list](#implement-categories-from-a-static-list)
+* [Implementing Redux](#implementing-Redux)
+* [SPARQL](#SPARQL)
+* [Adding Capacitor PWA support](#adding-Capacitor-PWA-support)
 * [Upgrade](#upgrade)
 * [The Rules of Hooks](#the-Rules-of-Hooks)
 * [Hooks Concepts](#hooks-Concepts)
@@ -47,8 +63,12 @@ https://quipu-a1093.firebaseapp.com
 
 ## TODO
 
+It's hard to keep up to date on a long to do list.  After all, that's why there are so many apps that let you cross items off when done.
+
+This todo list is mainly focused on refactoring the home page into separate discrete components and creating an MVP for this app.
+
 * The item list cards need a remove icon
-* Item list cards click should lead to a details page
+* (done) Item list cards click should lead to a details page
 * Failed searches need an error message
 * write tests for the Home page and the Categories component
 * move the category component into the components directory
@@ -325,8 +345,73 @@ I'm used to skipping linting errors to get past a blocker, but never a TypeScrip
 
 The TS GitHub says *#21602 was not merged. You can't ignore only certain errors.*
 
+So it's back to fixing this error.  The new Details component should have some tests also.
 
-## Item list cards click should lead to a details page
+Regarding the issue of testing Redux hooks like *useContext*, this is actually not the issue.
+
+As the logic goes, *By testing the user interaction rather than implementation you reduce the need for mocking, make refactoring easier, and often get a lot of extra test coverage "for free"..*
+
+*Hooks are an implementation detail. Testing them directly, especially with this much mocking, will highly couple your tests to your implementation.*
+
+So there should be a vanilla way to fix this test that doesn't involve Redux?  A lot of answers on StackOverflow show mocking react-redux.  The official Redux testing section says Redux is easy to test as they are pure functions.
+
+Would that be something like this?
+```TypeScript
+jest.mock('react-redux', () => ({
+  useDispatch: () => {},
+  useSelector: () => ({
+    your: 'state',
+  }),
+}));
+```
+
+If that was in the categories page test, I could understand it more, but this is the App.test.tsx file.
+
+Hang on, maybe there is a problem with the app right now.  Since working only on the home page refactor and linking to the details page, the new item page has not been used.  Trying it now shows this error:
+```
+×
+TypeError: Cannot read property 'map' of undefined
+ItemList
+C:/Users/timof/repos/timofeysie/xexenes/src/pages/components/items/ItemList.tsx:15
+> 15 |     <ul className="todo_list">
+     | ^  16 |       {state.todos.map((item: any, index: number) => (
+```
+
+I guess the item list page didn't get the memo about todos being renamed categories.  This will fix that:
+```TypeScript
+{state.categories.map((item: any, index: number) => (
+```
+
+Before anyone gets excited however, fixing that doesn't change the App.test.tsx:
+```
+TypeError: Cannot read property 'categories' of undefined
+```
+
+Given that the app works (now confirmed), and we don't want to be testing other pages in the App.test.tsx file, leaving this for now by deleting that test.  What is needed is a test for the newly created features during this refactor.  That means the details page.
+
+But, actually, there is an issue now.  Getting rid of todos and using categories has it's own problems.
+
+Categories is the object model for a SPAQL call, while the new items page has a list of search terms that return Wikipedia API summary results.  So there is a disconnect between the two models.  What we need is a combined model that accepts both.
+
+Currently, there are two empty rows on the list of new items at the start.  These would be the two default categories.  The first idea in combining the two data models was to have a view that conditionally shows either of the properties that has data.
+
+That would mean adding the summary data to the categories model.  This is what it uses right now:
+```
+<h5>{pageSummary["description"]}</h5>
+<span>{pageSummary["extract"]}</span>
+```
+
+However, if we do this, then there will still be two default items in the list that don't have summaries.  They will need to be fetched.
+
+One solution to this is just don't have default categories.  The user should be creating these anyhow.
+
+But if that's the case, then we need to hurry up and store the list in Firebase otherwise the user's going to get pretty angry having to recreate the list every time the app is run.
+
+It's hard to think about writing tests in this situation.  It's not just a refactor of code, it's brainstorming regarding how the app should work.  More sketches on napkins are needed.  Sorry if someone read this expecting a solution for how to test an app that uses Redux Hooks and is failing in the App.test.tsx file.
+
+
+
+## Routing to a details page
 
 We want to put pages in their own directory to contain all the related files like a feature directory structure.  I assume the CLI scaffold command would be something like this:
 ```
@@ -973,8 +1058,9 @@ Using an IonButton causes a page refresh.  Are these bugs in the Ionic React imp
 
 
 
-## Implement categories from a static list #3
+## Implement categories from a static list
 
+This is part of issue #3.
 
 Using Redux hooks for this one.  The goal is to create a categories component to view the list.
 ```
@@ -1230,7 +1316,7 @@ Had to restart VSCode after this to get some strange editor errors to disappear,
 ### Build the components, *the Billion Dollar Mistake* and page refreshing buttons
 
 Adding the put and done functions to the new item component was pretty easy.  But in the template we run into this error:
-```
+```html
 <li className="todo_item"
     value={index}
     key={index}
@@ -1243,14 +1329,14 @@ Property 'value' does not exist on type 'EventTarget'.ts(2339)
 ```
 
 I changed the event to look like this:
-```
+```JavaScript
 onClick={(e) => doneTodo(e.target as HTMLElement)}
 ```
 
 StackOverflow says: *HTMLElement is the parent of all HTML elements, but isn't guaranteed to have the property value. TypeScript detects this and throws the error. Cast event.target to the appropriate HTML element to ensure it is HTMLInputElement which does have a value property ([source](https://stackoverflow.com/questions/44321326/property-value-does-not-exist-on-type-eventtarget-in-typescript/44321394))*
 
 But unfortunately, none of those fixes worked.  This does, but then the vague type 'any' is pushed into the function:
-```
+```TypeScript
 const doneTodo = (index: any) => {
     console.log('index', index);
     return dispatch({
@@ -1310,7 +1396,7 @@ They have [about 800 issues](https://github.com/ionic-team/ionic/issues) on the 
 Maybe we should try the latest release.
 
 Remember, this project is currently working with ^4.9.0-rc.2.  The latest is 4.11.8.
-...
+```
 "react": "^16.9.0",
 ```
 
@@ -1328,7 +1414,9 @@ Property 'translate' is missing in type '{ children: Element; }' but required in
 ```
 
 
-## SPAQL
+## SPARQL
+
+This is the language used to get data from the WikiData project.
 
 [SPARQL](https://en.wikipedia.org/wiki/SPARQL) (pronounced "sparkle", a recursive acronym for SPARQL Protocol and RDF Query Language) is an RDF query language—that is, a semantic query language for databases—able to retrieve and manipulate data stored in Resource Description Framework (RDF) format.
 

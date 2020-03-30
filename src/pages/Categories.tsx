@@ -9,7 +9,6 @@ const Categories: React.FC = () => {
   return (
     <form className="category-list">
       <IonList>
-        {/* @ts-ignore */}
         {state.categories.map((category: any, index: any) => (
         <IonItem key={index}>
             <RouterLink to={'/details/'+category.name}>{category.content}</RouterLink>

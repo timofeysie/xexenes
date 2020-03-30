@@ -13,7 +13,7 @@ const ItemList = () => {
   return (
     <div>
       <ul className="todo_list">
-        {state.todos.map((item: any, index: number) => (
+        {state.categories.map((item: any, index: number) => (
           <li
             className="todo_item"
             value={index}
@@ -21,7 +21,8 @@ const ItemList = () => {
           >
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>{item.title}</IonCardTitle>
+              {item.title && <IonCardTitle>{item.title}</IonCardTitle>}
+              {item.label && <IonCardTitle>{item.label}</IonCardTitle>}
               </IonCardHeader>
               <IonCardContent>
                 <div className="truncate">{item.description}</div>
