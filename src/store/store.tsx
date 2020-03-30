@@ -1,25 +1,44 @@
 import React from "react";
-import Todos from './types/categories'
+import Categories from './types/categories'
 const initialState: any = {
-    todos: []
+    categories: [
+        {
+            content: 'fallacies',
+            name: 'fallacies', 
+            label: 'List of Fallacies', 
+            language: 'en', 
+            wd: 'Q186150', 
+            wdt: 'P31',
+            isCompleted: true 
+        },
+        {
+            content: 'cognitive bias',
+            name: 'cognitive_bias',
+            label: 'Cognitive Bias',
+            language: 'en',
+            wd: 'Q1127759',
+            wdt: 'P31',
+            isCompleted: false
+        }
+    ]
 }
 
 export const Store = React.createContext(initialState);
 
-function reducer(state: Todos, action: any) {
+function reducer(state: Categories, action: any) {
     switch(action.type){
 
         case 'PUT_DATA':
-            let todosList: any = state.todos;
-            todosList.push(action.payload);
-            return { ...state, todos: todosList }
+            let categoriesList: any = state.categories;
+            categoriesList.push(action.payload);
+            return { ...state, categories: categoriesList }
         
-        case 'DONE_TODO':
+        case 'OPEN_CATEGORY':
             let index: any = action.payload;
             console.log(index);
-            let tds = state.todos;
+            let tds = state.categories;
             tds.splice(index,1);
-            return { ...state, todos: tds }
+            return { ...state, categories: tds }
         
         default:
             return state;

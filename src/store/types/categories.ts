@@ -1,3 +1,3 @@
-export default interface Todos {
-      todos: any[]
+export default interface Categories {
+      categories: any[]
 }

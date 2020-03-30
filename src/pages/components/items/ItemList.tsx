@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Store } from "../../../store/store";
 import {
   IonCard,
@@ -13,16 +13,16 @@ const ItemList = () => {
   return (
     <div>
       <ul className="todo_list">
-        {state.todos.map((item: any, index: number) => (
+        {state.categories.map((item: any, index: number) => (
           <li
             className="todo_item"
             value={index}
             key={index}
-            // onClick={e => doneTodo(e.target as HTMLElement)}
           >
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>{item.title}</IonCardTitle>
+              {item.title && <IonCardTitle>{item.title}</IonCardTitle>}
+              {item.label && <IonCardTitle>{item.label}</IonCardTitle>}
               </IonCardHeader>
               <IonCardContent>
                 <div className="truncate">{item.description}</div>
