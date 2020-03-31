@@ -5,7 +5,7 @@ import { render, fireEvent } from '@testing-library/react';
 import renderer from 'react-test-renderer';
 import ItemList from './ItemList';
 import { createStore } from 'redux';
-import { Store } from "../../../store/store";
+import { Store } from "../../store/store";
 
 // function renderWithRedux(
 //   { store = createStore(useState) } = {}

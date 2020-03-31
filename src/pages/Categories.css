@@ -1,4 +1,11 @@
-
+.description {
+  text-align: right;
+  display: block;
+  float: right; 
+  clear: right;
+  position: relative !important;
+  left: 10%;
+}
 .app {
   padding-top: 10rem;
 }

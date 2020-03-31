@@ -1,5 +1,5 @@
 import React from "react";
-import { Store } from "../../../store/store";
+import { Store } from "../../store/store";
 import {
   IonCard,
   IonCardContent,
@@ -14,18 +14,23 @@ const ItemList = () => {
     <div>
       <ul className="todo_list">
         {state.categories.map((item: any, index: number) => (
-          <li
-            className="todo_item"
-            value={index}
-            key={index}
-          >
+          <li className="todo_item" value={index} key={index}>
             <IonCard>
               <IonCardHeader>
-              {item.title && <IonCardTitle>{item.title}</IonCardTitle>}
-              {item.label && <IonCardTitle>{item.label}</IonCardTitle>}
+                {item.title && (
+                  <IonCardTitle>
+                    {item.title}{" "}
+                    <span className="truncate h5-font ion-text-right">{item.description}</span>
+                  </IonCardTitle>
+                )}
+                {item.label && (
+                  <IonCardTitle>
+                    {item.label}{" "}
+                    <span className="truncate h5-font ion-text-right">{item.description}</span>
+                  </IonCardTitle>
+                )}
               </IonCardHeader>
               <IonCardContent>
-                <div className="truncate">{item.description}</div>
                 <div className="truncate">{item.extract}</div>
               </IonCardContent>
             </IonCard>
