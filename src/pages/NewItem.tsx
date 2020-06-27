@@ -21,7 +21,7 @@ import { Store } from "../store/store";
 import { useState } from "react";
 import { useEffect } from "react";
 import "./NewItem.css";
-import ItemList from './components/items/ItemList';
+import ItemList from '../components/items/ItemList';
 
 const NewItem: React.FC = (props: any) => {
   const { state, dispatch } = React.useContext(Store);

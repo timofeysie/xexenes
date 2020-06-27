@@ -571,7 +571,7 @@ To get the category selected, other than the route param, it might be a good ide
 
 It will duplicate the object, which is kind of an anti-pattern, ie: storing something that you can re-generate.  Not sure what is the best practice here.  We will start with a forEach solution and replace that when the best solution emerges.
 
-
+p.s. [found this discussion](https://spectrum.chat/testing-library/help/testing-redux-components-with-typescript~e578f24c-9782-41b1-818d-a5deabb03ef2) which had a great TypeScript version of the classic renderWithRedux function.
 
 
 

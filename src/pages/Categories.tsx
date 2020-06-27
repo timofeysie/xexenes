@@ -11,7 +11,10 @@ const Categories: React.FC = () => {
       <IonList>
         {state.categories.map((category: any, index: any) => (
         <IonItem key={index}>
-            <RouterLink to={'/details/'+category.name}>{category.content}</RouterLink>
+            <RouterLink to={'/details/'+category.name}>
+              {category.content} {category.title}
+              <span className="truncate h5-font description">{category.description}</span>
+              </RouterLink>
             <IonBadge color="success" slot="end">
               {category.wd}
             </IonBadge>
