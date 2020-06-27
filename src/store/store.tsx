@@ -1,6 +1,6 @@
 import React from "react";
 import Categories from './types/categories'
-const initialState: any = {
+export const initialState: any = {
     categories: [
         {
             content: 'fallacies',
@@ -25,7 +25,7 @@ const initialState: any = {
 
 export const Store = React.createContext(initialState);
 
-function reducer(state: Categories, action: any) {
+export function reducer(state: Categories, action: any) {
     switch(action.type){
 
         case 'PUT_DATA':
